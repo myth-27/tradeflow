@@ -1,0 +1,183 @@
+
+=== RUN (v9): BTC 5m last 30d ===
+FINAL CAPITAL
+$92,501
+-$7,499 (-7.5%)
+WIN RATE
+45.1%
+37W / 37L / 15BE
+PROFIT FACTOR
+0.87
+Gross win / gross loss
+MAX DRAWDOWN
+-22.1%
+-$25,454
+SHARPE RATIO
+-0.92
+>1.0 = good
+Equity Curve — $100,000 → $92,501
+📄 Export Full Report
+● Best trade: $4,439 Bearish Engulfing
+● Worst trade: -$2,426 Head & Shoulders
+Max drawdown: -22.1%
+Rules Applied This Run
+
+=== RUN (v9): ETH 5m last 30d ===
+  TIMEOUT: page.waitForFunction: Timeout 30000ms exceeded.
+
+=== RUN (v9): SOL 5m last 30d ===
+  TIMEOUT: page.waitForFunction: Timeout 30000ms exceeded.
+
+=== RUN (v9): BNB 5m last 30d ===
+  TIMEOUT: page.waitForFunction: Timeout 30000ms exceeded.
+
+=== RUN (v9): BTC 1h last 120d ===
+FINAL CAPITAL
+$113,219
+$13,219 (+13.2%)
+WIN RATE
+52.1%
+37W / 32L / 21BE
+PROFIT FACTOR
+1.26
+Gross win / gross loss
+MAX DRAWDOWN
+-14.5%
+-$17,130
+SHARPE RATIO
+1.55
+>1.0 = good
+Equity Curve — $100,000 → $113,219
+📄 Export Full Report
+28 Feb
+16 Mar
+23 Mar
+31 Mar
+7 Apr
+16 Apr
+20 Apr
+26 Apr
+29 Apr
+6 May
+11 May
+14 May
+28 May
+1 Jun
+14 Jun
+18 Jun
+$100k
+$105k
+
+=== RUN (v9): ETH 1h last 120d ===
+FINAL CAPITAL
+$102,839
+$2,839 (+2.8%)
+WIN RATE
+54.5%
+30W / 23L / 12BE
+PROFIT FACTOR
+1.07
+Gross win / gross loss
+MAX DRAWDOWN
+-10.5%
+-$10,473
+SHARPE RATIO
+0.48
+>1.0 = good
+Equity Curve — $100,000 → $102,839
+📄 Export Full Report
+● Best trade: $3,807 Bull Flag
+● Worst trade: -$2,309 Head & Shoulders
+Max drawdown: -10.5%
+Rules Applied This Run
+Entry T
+
+=== RUN (v9): BTC 5m 60-90d ago ===
+  TIMEOUT: page.waitForFunction: Timeout 30000ms exceeded.
+
+=== RUN (v9): ETH 5m 60-90d ago ===
+  TIMEOUT: page.waitForFunction: Timeout 30000ms exceeded.
+
+=== ALL RUNS (v9) ===
+[
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BTC 5m last 30d",
+    "returnPct": "-7.5",
+    "winRate": "45.1",
+    "profitFactor": "0.87",
+    "wins": "37",
+    "losses": "37",
+    "breakevens": "15"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "ETH 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "SOL 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BNB 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BTC 1h last 120d",
+    "returnPct": "+13.2",
+    "winRate": "52.1",
+    "profitFactor": "1.26",
+    "wins": "37",
+    "losses": "32",
+    "breakevens": "21"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "ETH 1h last 120d",
+    "returnPct": "+2.8",
+    "winRate": "54.5",
+    "profitFactor": "1.07",
+    "wins": "30",
+    "losses": "23",
+    "breakevens": "12"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T21:43:57.274Z",
+    "end": "2026-04-19T21:43:57.274Z",
+    "label": "BTC 5m 60-90d ago",
+    "error": "timeout"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T21:43:57.274Z",
+    "end": "2026-04-19T21:43:57.274Z",
+    "label": "ETH 5m 60-90d ago",
+    "error": "timeout"
+  }
+]
+DONE

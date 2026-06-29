@@ -1,0 +1,115 @@
+🧠 Intelligence Report
+
+Edge registry derived from every live signal and simulated trade — pattern × symbol × timeframe × regime × session.
+
+← Back to Simulator
+Last generated 18/06/2026, 22:08:49
+⬇ Export Full Backup
+↻ Generate Report Now
+OVERALL HEALTH SCORE
+0/100
+Share of active (20+ sample) edges with a profit factor above 1.0.
+Insights
+🏆 Best edge: Double Bottom in ranging during asia — 50% win rate, 0.78 PF (28 trades)
+⚠️ Avoid: Double Bottom in ranging during asia — only 5% win rate, PF 0.03 (22 trades)
+🏆 Top Edges
+🏆
+Double Bottom · BTCUSDT · asia
+28 trades
+PF 0.78
+50% WR
+🏆
+Double Top · BTCUSDT · asia
+20 trades
+PF 0.57
+30% WR
+🏆
+Double Bottom · ETHUSDT · asia
+29 trades
+PF 0.07
+10% WR
+🏆
+Double Bottom · SOLUSDT · asia
+22 trades
+PF 0.03
+5% WR
+📉 Worst Edges
+📉
+Double Bottom · SOLUSDT · asia
+22 trades
+PF 0.03
+5% WR
+📉
+Double Bottom · ETHUSDT · asia
+29 trades
+PF 0.07
+10% WR
+📉
+Double Top · BTCUSDT · asia
+20 trades
+PF 0.57
+30% WR
+📉
+Double Bottom · BTCUSDT · asia
+28 trades
+PF 0.78
+50% WR
+All Edge Combinations (349)
+PATTERN	SYMBOL	TF	REGIME	SESSION	TRADES	WIN RATE	PF	STATUS	SOURCE
+Double Bottom	ETHUSDT	5m	ranging	asia	29	10%	0.07	emerging	sim
+Double Bottom	BTCUSDT	5m	ranging	asia	28	50%	0.78	emerging	sim
+Double Bottom	SOLUSDT	5m	ranging	asia	22	5%	0.03	emerging	sim
+Double Top	BTCUSDT	5m	ranging	asia	20	30%	0.57	emerging	sim
+Double Bottom	BTCUSDT	5m	ranging	overlap	17	29%	0.23	learning	sim
+Bearish Engulfing	BTCUSDT	5m	weak_downtrend	asia	14	36%	0.86	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	asia	14	36%	0.37	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	new_york	14	21%	0.38	learning	sim
+Bearish Engulfing	ETHUSDT	5m	ranging	asia	13	69%	2.57	learning	sim
+Double Bottom	SOLUSDT	5m	ranging	overlap	13	8%	0.05	learning	sim
+Double Top	SOLUSDT	5m	ranging	asia	13	23%	0.34	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	new_york	13	38%	1.42	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	asia	13	15%	0.32	learning	sim
+Double Top	BTCUSDT	5m	ranging	overlap	12	33%	0.48	learning	sim
+Double Top	ETHUSDT	5m	ranging	asia	12	50%	1.10	learning	sim
+Bearish Engulfing	BTCUSDT	5m	weak_downtrend	overlap	11	64%	1.41	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	asia	11	9%	0.02	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	overlap	11	36%	0.70	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	london	11	9%	0.03	learning	sim
+Double Top	ETHUSDT	5m	ranging	new_york	10	10%	0.21	learning	sim
+Ascending Triangle	ETHUSDT	5m	weak_uptrend	asia	10	10%	0.12	learning	sim
+Double Top	SOLUSDT	5m	ranging	london	10	20%	0.43	learning	sim
+Double Top	BNBUSDT	5m	ranging	overlap	10	60%	1.93	learning	sim
+Double Bottom	BTCUSDT	5m	ranging	london	10	30%	0.77	learning	sim
+Double Bottom	BTCUSDT	5m	ranging	new_york	10	20%	0.45	learning	sim
+Double Bottom	SOLUSDT	5m	weak_downtrend	asia	9	11%	0.02	learning	sim
+Double Bottom	BNBUSDT	5m	ranging	overlap	9	44%	0.87	learning	sim
+Ascending Triangle	BNBUSDT	5m	weak_uptrend	asia	9	22%	0.42	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_uptrend	asia	9	78%	2.49	learning	sim
+Double Top	BTCUSDT	5m	ranging	london	9	33%	0.98	learning	sim
+Double Top	ETHUSDT	5m	ranging	overlap	8	13%	0.07	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_downtrend	new_york	8	50%	0.26	learning	sim
+Bull Flag	ETHUSDT	1h	weak_uptrend	asia	8	50%	1.60	learning	sim
+Double Top	BTCUSDT	5m	ranging	new_york	8	13%	0.08	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	overlap	7	57%	0.75	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	london	7	100%	9.99	learning	sim
+Morning Star	ETHUSDT	5m	weak_uptrend	asia	7	86%	5.73	learning	sim
+Double Bottom	ETHUSDT	5m	weak_downtrend	asia	7	29%	0.98	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	london	7	29%	0.19	learning	sim
+Head & Shoulders	SOLUSDT	5m	ranging	london	7	57%	1.22	learning	sim
+Head & Shoulders	SOLUSDT	5m	weak_uptrend	asia	7	29%	0.10	learning	sim
+Double Bottom	BNBUSDT	5m	ranging	london	7	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	1h	weak_uptrend	london	7	100%	9.99	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	new_york	6	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	ranging	asia	6	0%	0.00	learning	sim
+Double Bottom	BTCUSDT	5m	weak_downtrend	overlap	6	33%	0.61	learning	sim
+Double Top	ETHUSDT	5m	ranging	london	6	33%	0.84	learning	sim
+Head & Shoulders	ETHUSDT	5m	weak_uptrend	london	6	67%	2.02	learning	sim
+Double Bottom	SOLUSDT	5m	ranging	london	6	33%	0.23	learning	sim
+Double Bottom	BNBUSDT	5m	ranging	new_york	6	50%	1.93	learning	sim
+📸 Candle Snapshot Store
+Total: 1240
+Completed: 1240
+Wins: 463
+Losses: 626
+
+1240 snapshots — ready for CNN/LSTM visual pattern training

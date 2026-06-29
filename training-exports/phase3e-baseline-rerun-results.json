@@ -1,0 +1,2774 @@
+[
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 337,
+    "totalSignals": 8866,
+    "winRate": 44.21364985163205,
+    "profitFactor": 0.903533996352801,
+    "totalReturn": -15.848988141109935,
+    "finalCapital": 84151.01185889007,
+    "startingCapital": 100000,
+    "maxDrawdown": 26.08994732257826,
+    "sharpeRatio": -0.5600137440118795,
+    "expectancy": -0.15671619626990396,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1221,
+        "tradesAllowed": 53,
+        "tradesBlocked": 51,
+        "winRate": 42.857142857142854
+      },
+      "weak_uptrend": {
+        "candles": 4962,
+        "tradesAllowed": 157,
+        "tradesBlocked": 528,
+        "winRate": 45.08196721311475
+      },
+      "strong_downtrend": {
+        "candles": 792,
+        "tradesAllowed": 24,
+        "tradesBlocked": 4,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 3518,
+        "tradesAllowed": 139,
+        "tradesBlocked": 125,
+        "winRate": 52.38095238095239
+      },
+      "ranging": {
+        "candles": 3039,
+        "tradesAllowed": 106,
+        "tradesBlocked": 241,
+        "winRate": 34.523809523809526
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 98,
+      "tradesRejectedByRR": 953,
+      "tradesRejectedByVolume": 78,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 540,
+      "tradesRejectedByDailyLimit": 242,
+      "tradesRejectedByWeeklyLimit": 1328,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 871,
+      "tradesRejectedByValidation": 193,
+      "tradesRejectedByPatternLogic": 7377,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1515
+    },
+    "totalCandles": 17432
+  },
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 576,
+    "totalSignals": 20251,
+    "winRate": 29.34027777777778,
+    "profitFactor": 0.5220538160097369,
+    "totalReturn": -50.12459657298609,
+    "finalCapital": 49875.40342701391,
+    "startingCapital": 100000,
+    "maxDrawdown": 50.40591985860793,
+    "sharpeRatio": -3.3588827645446924,
+    "expectancy": -0.471478586606533,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 464,
+        "tradesAllowed": 33,
+        "tradesBlocked": 16,
+        "winRate": 35.714285714285715
+      },
+      "weak_uptrend": {
+        "candles": 4873,
+        "tradesAllowed": 192,
+        "tradesBlocked": 354,
+        "winRate": 30.357142857142854
+      },
+      "strong_downtrend": {
+        "candles": 649,
+        "tradesAllowed": 12,
+        "tradesBlocked": 4,
+        "winRate": 25
+      },
+      "weak_downtrend": {
+        "candles": 6053,
+        "tradesAllowed": 105,
+        "tradesBlocked": 125,
+        "winRate": 29.11392405063291
+      },
+      "ranging": {
+        "candles": 18259,
+        "tradesAllowed": 337,
+        "tradesBlocked": 647,
+        "winRate": 28.327645051194537
+      },
+      "low_volatility": {
+        "candles": 3876,
+        "tradesAllowed": 0,
+        "tradesBlocked": 3876,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 96,
+      "tradesRejectedByRR": 364,
+      "tradesRejectedByVolume": 187,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 1100,
+      "tradesRejectedByDailyLimit": 290,
+      "tradesRejectedByWeeklyLimit": 3316,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 6229,
+      "tradesRejectedByScore": 959,
+      "tradesRejectedByValidation": 1498,
+      "tradesRejectedByPatternLogic": 12127,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 3556
+    },
+    "totalCandles": 52552
+  },
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 268,
+    "totalSignals": 9027,
+    "winRate": 51.11940298507462,
+    "profitFactor": 1.0597325935233997,
+    "totalReturn": 10.294157297874582,
+    "finalCapital": 110294.15729787458,
+    "startingCapital": 100000,
+    "maxDrawdown": 24.97167016096254,
+    "sharpeRatio": 0.3750704309600856,
+    "expectancy": -0.06072951379472258,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1627,
+        "tradesAllowed": 25,
+        "tradesBlocked": 203,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 5311,
+        "tradesAllowed": 103,
+        "tradesBlocked": 1062,
+        "winRate": 55.072463768115945
+      },
+      "strong_downtrend": {
+        "candles": 813,
+        "tradesAllowed": 21,
+        "tradesBlocked": 20,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 3973,
+        "tradesAllowed": 143,
+        "tradesBlocked": 255,
+        "winRate": 47.91666666666667
+      },
+      "ranging": {
+        "candles": 2709,
+        "tradesAllowed": 90,
+        "tradesBlocked": 392,
+        "winRate": 52.112676056338024
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 84,
+      "tradesRejectedByRR": 242,
+      "tradesRejectedByVolume": 23,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 300,
+      "tradesRejectedByDailyLimit": 531,
+      "tradesRejectedByWeeklyLimit": 1514,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 1909,
+      "tradesRejectedByValidation": 130,
+      "tradesRejectedByPatternLogic": 8149,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1283
+    },
+    "totalCandles": 17432
+  },
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 84,
+    "totalSignals": 2286,
+    "winRate": 55.952380952380956,
+    "profitFactor": 1.0984432034313503,
+    "totalReturn": 6.711707275972309,
+    "finalCapital": 106711.70727597231,
+    "startingCapital": 100000,
+    "maxDrawdown": 13.177918406735797,
+    "sharpeRatio": 0.6507726750876575,
+    "expectancy": 0.028327569981261957,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 515,
+        "tradesAllowed": 19,
+        "tradesBlocked": 34,
+        "winRate": 85.71428571428571
+      },
+      "weak_uptrend": {
+        "candles": 1462,
+        "tradesAllowed": 56,
+        "tradesBlocked": 238,
+        "winRate": 52.94117647058824
+      },
+      "strong_downtrend": {
+        "candles": 224,
+        "tradesAllowed": 9,
+        "tradesBlocked": 3,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 996,
+        "tradesAllowed": 51,
+        "tradesBlocked": 30,
+        "winRate": 48.38709677419355
+      },
+      "ranging": {
+        "candles": 343,
+        "tradesAllowed": 18,
+        "tradesBlocked": 23,
+        "winRate": 75
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 26,
+      "tradesRejectedByRR": 279,
+      "tradesRejectedByVolume": 22,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 60,
+      "tradesRejectedByDailyLimit": 62,
+      "tradesRejectedByWeeklyLimit": 177,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 306,
+      "tradesRejectedByValidation": 203,
+      "tradesRejectedByPatternLogic": 2321,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4359
+  },
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 280,
+    "totalSignals": 8831,
+    "winRate": 55.35714285714286,
+    "profitFactor": 1.6022829299472572,
+    "totalReturn": 131.22636018119215,
+    "finalCapital": 231226.36018119217,
+    "startingCapital": 100000,
+    "maxDrawdown": 12.30224425084221,
+    "sharpeRatio": 2.6287251469935766,
+    "expectancy": 0.11408169467693963,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1822,
+        "tradesAllowed": 68,
+        "tradesBlocked": 99,
+        "winRate": 64.44444444444444
+      },
+      "weak_uptrend": {
+        "candles": 5011,
+        "tradesAllowed": 206,
+        "tradesBlocked": 715,
+        "winRate": 52.4390243902439
+      },
+      "strong_downtrend": {
+        "candles": 1423,
+        "tradesAllowed": 34,
+        "tradesBlocked": 35,
+        "winRate": 59.09090909090909
+      },
+      "weak_downtrend": {
+        "candles": 5345,
+        "tradesAllowed": 166,
+        "tradesBlocked": 271,
+        "winRate": 53.333333333333336
+      },
+      "ranging": {
+        "candles": 1274,
+        "tradesAllowed": 61,
+        "tradesBlocked": 132,
+        "winRate": 53.84615384615385
+      },
+      "low_volatility": {
+        "candles": 26,
+        "tradesAllowed": 0,
+        "tradesBlocked": 26,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 60,
+      "tradesRejectedByRR": 646,
+      "tradesRejectedByVolume": 249,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 300,
+      "tradesRejectedByDailyLimit": 313,
+      "tradesRejectedByWeeklyLimit": 648,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 1003,
+      "tradesRejectedByValidation": 360,
+      "tradesRejectedByPatternLogic": 9758,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1258
+    },
+    "totalCandles": 17432
+  },
+  {
+    "windowId": 1,
+    "windowLabel": "Bull: Oct 2020 - Mar 2021",
+    "handPickedRegime": "bull",
+    "start": "2020-10-01",
+    "end": "2021-03-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 61,
+    "totalSignals": 2354,
+    "winRate": 55.73770491803278,
+    "profitFactor": 1.3787577955991779,
+    "totalReturn": 24.917013399530216,
+    "finalCapital": 124917.01339953022,
+    "startingCapital": 100000,
+    "maxDrawdown": 16.072026861357187,
+    "sharpeRatio": 2.537342471051378,
+    "expectancy": 0.24197101178970465,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 494,
+        "tradesAllowed": 15,
+        "tradesBlocked": 30,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 1445,
+        "tradesAllowed": 88,
+        "tradesBlocked": 199,
+        "winRate": 57.14285714285714
+      },
+      "strong_downtrend": {
+        "candles": 392,
+        "tradesAllowed": 7,
+        "tradesBlocked": 10,
+        "winRate": 25
+      },
+      "weak_downtrend": {
+        "candles": 1409,
+        "tradesAllowed": 31,
+        "tradesBlocked": 73,
+        "winRate": 52.38095238095239
+      },
+      "ranging": {
+        "candles": 156,
+        "tradesAllowed": 11,
+        "tradesBlocked": 13,
+        "winRate": 100
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 15,
+      "tradesRejectedByRR": 129,
+      "tradesRejectedByVolume": 55,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 20,
+      "tradesRejectedByDailyLimit": 12,
+      "tradesRejectedByWeeklyLimit": 97,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 270,
+      "tradesRejectedByValidation": 518,
+      "tradesRejectedByPatternLogic": 2719,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4359
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 397,
+    "totalSignals": 9157,
+    "winRate": 40.15151515151515,
+    "profitFactor": 0.8030769659098086,
+    "totalReturn": -30.212214130796532,
+    "finalCapital": 69787.78586920346,
+    "startingCapital": 100000,
+    "maxDrawdown": 30.42729755659628,
+    "sharpeRatio": -1.2945514525090023,
+    "expectancy": -0.25917503665792807,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 702,
+        "tradesAllowed": 33,
+        "tradesBlocked": 77,
+        "winRate": 53.84615384615385
+      },
+      "weak_uptrend": {
+        "candles": 3397,
+        "tradesAllowed": 133,
+        "tradesBlocked": 461,
+        "winRate": 39.63963963963964
+      },
+      "strong_downtrend": {
+        "candles": 332,
+        "tradesAllowed": 11,
+        "tradesBlocked": 4,
+        "winRate": 42.857142857142854
+      },
+      "weak_downtrend": {
+        "candles": 2900,
+        "tradesAllowed": 103,
+        "tradesBlocked": 118,
+        "winRate": 48.68421052631579
+      },
+      "ranging": {
+        "candles": 5382,
+        "tradesAllowed": 221,
+        "tradesBlocked": 408,
+        "winRate": 34.463276836158194
+      },
+      "low_volatility": {
+        "candles": 69,
+        "tradesAllowed": 0,
+        "tradesBlocked": 69,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 87,
+      "tradesRejectedByRR": 736,
+      "tradesRejectedByVolume": 98,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 500,
+      "tradesRejectedByDailyLimit": 268,
+      "tradesRejectedByWeeklyLimit": 464,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 228,
+      "tradesRejectedByScore": 970,
+      "tradesRejectedByValidation": 375,
+      "tradesRejectedByPatternLogic": 7014,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1576
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 118,
+    "totalSignals": 2174,
+    "winRate": 54.700854700854705,
+    "profitFactor": 1.621599553614554,
+    "totalReturn": 52.26502651126339,
+    "finalCapital": 152265.0265112634,
+    "startingCapital": 100000,
+    "maxDrawdown": 20.017673041016398,
+    "sharpeRatio": 2.996647895148102,
+    "expectancy": 0.10138327486369764,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 310,
+        "tradesAllowed": 9,
+        "tradesBlocked": 19,
+        "winRate": 40
+      },
+      "weak_uptrend": {
+        "candles": 1363,
+        "tradesAllowed": 71,
+        "tradesBlocked": 248,
+        "winRate": 60
+      },
+      "strong_downtrend": {
+        "candles": 85,
+        "tradesAllowed": 5,
+        "tradesBlocked": 2,
+        "winRate": 25
+      },
+      "weak_downtrend": {
+        "candles": 695,
+        "tradesAllowed": 46,
+        "tradesBlocked": 48,
+        "winRate": 53.333333333333336
+      },
+      "ranging": {
+        "candles": 601,
+        "tradesAllowed": 52,
+        "tradesBlocked": 72,
+        "winRate": 52.94117647058824
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 27,
+      "tradesRejectedByRR": 374,
+      "tradesRejectedByVolume": 58,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 160,
+      "tradesRejectedByDailyLimit": 3,
+      "tradesRejectedByWeeklyLimit": 150,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 331,
+      "tradesRejectedByValidation": 66,
+      "tradesRejectedByPatternLogic": 1767,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 307,
+    "totalSignals": 9104,
+    "winRate": 44.299674267100976,
+    "profitFactor": 0.8146875938412718,
+    "totalReturn": -26.91113325039862,
+    "finalCapital": 73088.86674960138,
+    "startingCapital": 100000,
+    "maxDrawdown": 28.305886195705625,
+    "sharpeRatio": -1.2171717431576627,
+    "expectancy": -0.16471492919686903,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 959,
+        "tradesAllowed": 21,
+        "tradesBlocked": 160,
+        "winRate": 61.53846153846154
+      },
+      "weak_uptrend": {
+        "candles": 4372,
+        "tradesAllowed": 91,
+        "tradesBlocked": 978,
+        "winRate": 47.61904761904761
+      },
+      "strong_downtrend": {
+        "candles": 393,
+        "tradesAllowed": 15,
+        "tradesBlocked": 9,
+        "winRate": 60
+      },
+      "weak_downtrend": {
+        "candles": 3668,
+        "tradesAllowed": 130,
+        "tradesBlocked": 172,
+        "winRate": 37.93103448275862
+      },
+      "ranging": {
+        "candles": 4661,
+        "tradesAllowed": 168,
+        "tradesBlocked": 568,
+        "winRate": 44.02985074626866
+      },
+      "low_volatility": {
+        "candles": 4,
+        "tradesAllowed": 0,
+        "tradesBlocked": 4,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 107,
+      "tradesRejectedByRR": 243,
+      "tradesRejectedByVolume": 27,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 440,
+      "tradesRejectedByDailyLimit": 357,
+      "tradesRejectedByWeeklyLimit": 1480,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 45,
+      "tradesRejectedByScore": 1860,
+      "tradesRejectedByValidation": 181,
+      "tradesRejectedByPatternLogic": 7668,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1338
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 127,
+    "totalSignals": 2191,
+    "winRate": 54.330708661417326,
+    "profitFactor": 1.4360120396719482,
+    "totalReturn": 44.4988841882874,
+    "finalCapital": 144498.8841882874,
+    "startingCapital": 100000,
+    "maxDrawdown": 8.726116619753006,
+    "sharpeRatio": 2.335534848196648,
+    "expectancy": 0.059995842726768556,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 336,
+        "tradesAllowed": 19,
+        "tradesBlocked": 14,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 1193,
+        "tradesAllowed": 61,
+        "tradesBlocked": 231,
+        "winRate": 60.60606060606061
+      },
+      "strong_downtrend": {
+        "candles": 90,
+        "tradesAllowed": 12,
+        "tradesBlocked": 1,
+        "winRate": 41.66666666666667
+      },
+      "weak_downtrend": {
+        "candles": 906,
+        "tradesAllowed": 54,
+        "tradesBlocked": 34,
+        "winRate": 55.55555555555556
+      },
+      "ranging": {
+        "candles": 480,
+        "tradesAllowed": 43,
+        "tradesBlocked": 53,
+        "winRate": 53.125
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 37,
+      "tradesRejectedByRR": 343,
+      "tradesRejectedByVolume": 40,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 100,
+      "tradesRejectedByDailyLimit": 12,
+      "tradesRejectedByWeeklyLimit": 49,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 293,
+      "tradesRejectedByValidation": 61,
+      "tradesRejectedByPatternLogic": 1943,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 329,
+    "totalSignals": 9103,
+    "winRate": 48.170731707317074,
+    "profitFactor": 1.1841357623634419,
+    "totalReturn": 51.73182076791103,
+    "finalCapital": 151731.82076791103,
+    "startingCapital": 100000,
+    "maxDrawdown": 22.391565074154393,
+    "sharpeRatio": 1.0731491788285488,
+    "expectancy": -0.053183890860890704,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1419,
+        "tradesAllowed": 44,
+        "tradesBlocked": 90,
+        "winRate": 29.629629629629626
+      },
+      "weak_uptrend": {
+        "candles": 5355,
+        "tradesAllowed": 161,
+        "tradesBlocked": 663,
+        "winRate": 52.88461538461539
+      },
+      "strong_downtrend": {
+        "candles": 770,
+        "tradesAllowed": 22,
+        "tradesBlocked": 10,
+        "winRate": 52.94117647058824
+      },
+      "weak_downtrend": {
+        "candles": 4408,
+        "tradesAllowed": 169,
+        "tradesBlocked": 108,
+        "winRate": 53.21100917431193
+      },
+      "ranging": {
+        "candles": 2225,
+        "tradesAllowed": 89,
+        "tradesBlocked": 153,
+        "winRate": 38.88888888888889
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 65,
+      "tradesRejectedByRR": 936,
+      "tradesRejectedByVolume": 99,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 540,
+      "tradesRejectedByDailyLimit": 555,
+      "tradesRejectedByWeeklyLimit": 771,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 925,
+      "tradesRejectedByValidation": 157,
+      "tradesRejectedByPatternLogic": 8583,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1217
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 2,
+    "windowLabel": "Bull: Oct 2023 - Mar 2024",
+    "handPickedRegime": "bull",
+    "start": "2023-10-01",
+    "end": "2024-03-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 74,
+    "totalSignals": 2525,
+    "winRate": 62.16216216216216,
+    "profitFactor": 1.4525626758022314,
+    "totalReturn": 24.32463161092595,
+    "finalCapital": 124324.63161092595,
+    "startingCapital": 100000,
+    "maxDrawdown": 11.143752470598189,
+    "sharpeRatio": 2.340562802013477,
+    "expectancy": 0.17121544542509604,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 483,
+        "tradesAllowed": 12,
+        "tradesBlocked": 18,
+        "winRate": 80
+      },
+      "weak_uptrend": {
+        "candles": 1664,
+        "tradesAllowed": 72,
+        "tradesBlocked": 160,
+        "winRate": 65.21739130434783
+      },
+      "strong_downtrend": {
+        "candles": 182,
+        "tradesAllowed": 6,
+        "tradesBlocked": 2,
+        "winRate": 60
+      },
+      "weak_downtrend": {
+        "candles": 1055,
+        "tradesAllowed": 67,
+        "tradesBlocked": 26,
+        "winRate": 57.14285714285714
+      },
+      "ranging": {
+        "candles": 226,
+        "tradesAllowed": 12,
+        "tradesBlocked": 8,
+        "winRate": 66.66666666666666
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 25,
+      "tradesRejectedByRR": 443,
+      "tradesRejectedByVolume": 45,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 20,
+      "tradesRejectedByDailyLimit": 8,
+      "tradesRejectedByWeeklyLimit": 0,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 169,
+      "tradesRejectedByValidation": 301,
+      "tradesRejectedByPatternLogic": 2525,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 393,
+    "totalSignals": 8184,
+    "winRate": 40.458015267175576,
+    "profitFactor": 0.7565822521812225,
+    "totalReturn": -31.7685460831293,
+    "finalCapital": 68231.4539168707,
+    "startingCapital": 100000,
+    "maxDrawdown": 31.7685460831293,
+    "sharpeRatio": -1.5366578845534349,
+    "expectancy": -0.2732711591935266,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 888,
+        "tradesAllowed": 49,
+        "tradesBlocked": 56,
+        "winRate": 41.46341463414634
+      },
+      "weak_uptrend": {
+        "candles": 3810,
+        "tradesAllowed": 197,
+        "tradesBlocked": 308,
+        "winRate": 29.45205479452055
+      },
+      "strong_downtrend": {
+        "candles": 1045,
+        "tradesAllowed": 23,
+        "tradesBlocked": 9,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 4327,
+        "tradesAllowed": 137,
+        "tradesBlocked": 105,
+        "winRate": 47.368421052631575
+      },
+      "ranging": {
+        "candles": 2913,
+        "tradesAllowed": 118,
+        "tradesBlocked": 193,
+        "winRate": 48.484848484848484
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 81,
+      "tradesRejectedByRR": 762,
+      "tradesRejectedByVolume": 91,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 631,
+      "tradesRejectedByDailyLimit": 182,
+      "tradesRejectedByWeeklyLimit": 862,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 580,
+      "tradesRejectedByValidation": 175,
+      "tradesRejectedByPatternLogic": 7981,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1245
+    },
+    "totalCandles": 17638
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 110,
+    "totalSignals": 1974,
+    "winRate": 52.72727272727272,
+    "profitFactor": 1.0441077298495138,
+    "totalReturn": 4.262020225528686,
+    "finalCapital": 104262.02022552869,
+    "startingCapital": 100000,
+    "maxDrawdown": 19.372825990742363,
+    "sharpeRatio": 0.3435353904172492,
+    "expectancy": -0.022041738093755314,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 304,
+        "tradesAllowed": 29,
+        "tradesBlocked": 21,
+        "winRate": 53.84615384615385
+      },
+      "weak_uptrend": {
+        "candles": 1091,
+        "tradesAllowed": 114,
+        "tradesBlocked": 140,
+        "winRate": 45.16129032258064
+      },
+      "strong_downtrend": {
+        "candles": 258,
+        "tradesAllowed": 10,
+        "tradesBlocked": 5,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 1214,
+        "tradesAllowed": 53,
+        "tradesBlocked": 23,
+        "winRate": 58.333333333333336
+      },
+      "ranging": {
+        "candles": 278,
+        "tradesAllowed": 22,
+        "tradesBlocked": 18,
+        "winRate": 88.88888888888889
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 51,
+      "tradesRejectedByRR": 295,
+      "tradesRejectedByVolume": 36,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 120,
+      "tradesRejectedByDailyLimit": 45,
+      "tradesRejectedByWeeklyLimit": 70,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 171,
+      "tradesRejectedByValidation": 139,
+      "tradesRejectedByPatternLogic": 2108,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4410
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 274,
+    "totalSignals": 9865,
+    "winRate": 53.284671532846716,
+    "profitFactor": 1.402615609757693,
+    "totalReturn": 97.42359097940067,
+    "finalCapital": 197423.59097940067,
+    "startingCapital": 100000,
+    "maxDrawdown": 10.912077762689481,
+    "sharpeRatio": 2.367482939636407,
+    "expectancy": 0.045506941915619326,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1332,
+        "tradesAllowed": 42,
+        "tradesBlocked": 131,
+        "winRate": 51.724137931034484
+      },
+      "weak_uptrend": {
+        "candles": 4826,
+        "tradesAllowed": 134,
+        "tradesBlocked": 987,
+        "winRate": 58.139534883720934
+      },
+      "strong_downtrend": {
+        "candles": 1229,
+        "tradesAllowed": 25,
+        "tradesBlocked": 21,
+        "winRate": 56.25
+      },
+      "weak_downtrend": {
+        "candles": 4564,
+        "tradesAllowed": 138,
+        "tradesBlocked": 246,
+        "winRate": 49.43820224719101
+      },
+      "ranging": {
+        "candles": 2390,
+        "tradesAllowed": 69,
+        "tradesBlocked": 397,
+        "winRate": 51.85185185185185
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 92,
+      "tradesRejectedByRR": 468,
+      "tradesRejectedByVolume": 42,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 280,
+      "tradesRejectedByDailyLimit": 170,
+      "tradesRejectedByWeeklyLimit": 192,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 1740,
+      "tradesRejectedByValidation": 146,
+      "tradesRejectedByPatternLogic": 9376,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1561
+    },
+    "totalCandles": 17638
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 92,
+    "totalSignals": 2161,
+    "winRate": 57.14285714285714,
+    "profitFactor": 1.3189485654637272,
+    "totalReturn": 22.94200607172924,
+    "finalCapital": 122942.00607172924,
+    "startingCapital": 100000,
+    "maxDrawdown": 12.110453049224494,
+    "sharpeRatio": 1.754114340495491,
+    "expectancy": 0.06373559356165426,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 366,
+        "tradesAllowed": 20,
+        "tradesBlocked": 11,
+        "winRate": 83.33333333333334
+      },
+      "weak_uptrend": {
+        "candles": 1334,
+        "tradesAllowed": 95,
+        "tradesBlocked": 190,
+        "winRate": 47.72727272727273
+      },
+      "strong_downtrend": {
+        "candles": 352,
+        "tradesAllowed": 16,
+        "tradesBlocked": 5,
+        "winRate": 25
+      },
+      "weak_downtrend": {
+        "candles": 1213,
+        "tradesAllowed": 64,
+        "tradesBlocked": 38,
+        "winRate": 62.5
+      },
+      "ranging": {
+        "candles": 203,
+        "tradesAllowed": 20,
+        "tradesBlocked": 22,
+        "winRate": 62.5
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 39,
+      "tradesRejectedByRR": 278,
+      "tradesRejectedByVolume": 25,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 60,
+      "tradesRejectedByDailyLimit": 21,
+      "tradesRejectedByWeeklyLimit": 54,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 241,
+      "tradesRejectedByValidation": 170,
+      "tradesRejectedByPatternLogic": 2488,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4410
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 273,
+    "totalSignals": 9416,
+    "winRate": 57.87545787545788,
+    "profitFactor": 1.4539590294133622,
+    "totalReturn": 107.5667144607344,
+    "finalCapital": 207566.7144607344,
+    "startingCapital": 100000,
+    "maxDrawdown": 13.13730908572029,
+    "sharpeRatio": 2.352248027804319,
+    "expectancy": 0.07046946875795651,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 1493,
+        "tradesAllowed": 58,
+        "tradesBlocked": 83,
+        "winRate": 56.75675675675676
+      },
+      "weak_uptrend": {
+        "candles": 4956,
+        "tradesAllowed": 203,
+        "tradesBlocked": 663,
+        "winRate": 52.94117647058824
+      },
+      "strong_downtrend": {
+        "candles": 1410,
+        "tradesAllowed": 29,
+        "tradesBlocked": 10,
+        "winRate": 78.57142857142857
+      },
+      "weak_downtrend": {
+        "candles": 5268,
+        "tradesAllowed": 201,
+        "tradesBlocked": 101,
+        "winRate": 59.77011494252874
+      },
+      "ranging": {
+        "candles": 1576,
+        "tradesAllowed": 96,
+        "tradesBlocked": 109,
+        "winRate": 57.99999999999999
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 77,
+      "tradesRejectedByRR": 751,
+      "tradesRejectedByVolume": 99,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 240,
+      "tradesRejectedByDailyLimit": 249,
+      "tradesRejectedByWeeklyLimit": 390,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 867,
+      "tradesRejectedByValidation": 451,
+      "tradesRejectedByPatternLogic": 10064,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1242
+    },
+    "totalCandles": 17638
+  },
+  {
+    "windowId": 3,
+    "windowLabel": "Bear: May 2021 - Oct 2021",
+    "handPickedRegime": "bear",
+    "start": "2021-05-01",
+    "end": "2021-10-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 63,
+    "totalSignals": 2318,
+    "winRate": 64.51612903225806,
+    "profitFactor": 1.8925139935124575,
+    "totalReturn": 41.11090540354792,
+    "finalCapital": 141110.90540354792,
+    "startingCapital": 100000,
+    "maxDrawdown": 9.318740905599137,
+    "sharpeRatio": 4.0542050641350675,
+    "expectancy": 0.27588329913760556,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 439,
+        "tradesAllowed": 18,
+        "tradesBlocked": 13,
+        "winRate": 80
+      },
+      "weak_uptrend": {
+        "candles": 1520,
+        "tradesAllowed": 98,
+        "tradesBlocked": 158,
+        "winRate": 58.620689655172406
+      },
+      "strong_downtrend": {
+        "candles": 387,
+        "tradesAllowed": 9,
+        "tradesBlocked": 1,
+        "winRate": 100
+      },
+      "weak_downtrend": {
+        "candles": 1237,
+        "tradesAllowed": 44,
+        "tradesBlocked": 27,
+        "winRate": 66.66666666666666
+      },
+      "ranging": {
+        "candles": 172,
+        "tradesAllowed": 8,
+        "tradesBlocked": 8,
+        "winRate": 25
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 22,
+      "tradesRejectedByRR": 142,
+      "tradesRejectedByVolume": 33,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 20,
+      "tradesRejectedByDailyLimit": 13,
+      "tradesRejectedByWeeklyLimit": 49,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 174,
+      "tradesRejectedByValidation": 582,
+      "tradesRejectedByPatternLogic": 2657,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4410
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 407,
+    "totalSignals": 8700,
+    "winRate": 33.415233415233416,
+    "profitFactor": 0.6292086449651276,
+    "totalReturn": -38.44303733587024,
+    "finalCapital": 61556.96266412976,
+    "startingCapital": 100000,
+    "maxDrawdown": 38.539070038934405,
+    "sharpeRatio": -2.4695476172802517,
+    "expectancy": -0.4039506336461127,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 522,
+        "tradesAllowed": 30,
+        "tradesBlocked": 45,
+        "winRate": 52.17391304347826
+      },
+      "weak_uptrend": {
+        "candles": 3161,
+        "tradesAllowed": 185,
+        "tradesBlocked": 194,
+        "winRate": 22.857142857142858
+      },
+      "strong_downtrend": {
+        "candles": 899,
+        "tradesAllowed": 13,
+        "tradesBlocked": 11,
+        "winRate": 75
+      },
+      "weak_downtrend": {
+        "candles": 4483,
+        "tradesAllowed": 128,
+        "tradesBlocked": 85,
+        "winRate": 45.45454545454545
+      },
+      "ranging": {
+        "candles": 3790,
+        "tradesAllowed": 188,
+        "tradesBlocked": 208,
+        "winRate": 32.075471698113205
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 83,
+      "tradesRejectedByRR": 760,
+      "tradesRejectedByVolume": 53,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 680,
+      "tradesRejectedByDailyLimit": 130,
+      "tradesRejectedByWeeklyLimit": 403,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 490,
+      "tradesRejectedByValidation": 248,
+      "tradesRejectedByPatternLogic": 8322,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1279
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 293,
+    "totalSignals": 8802,
+    "winRate": 47.781569965870304,
+    "profitFactor": 1.0313694587308377,
+    "totalReturn": 5.8956233158216635,
+    "finalCapital": 105895.62331582166,
+    "startingCapital": 100000,
+    "maxDrawdown": 23.38456353132198,
+    "sharpeRatio": 0.2147325581930097,
+    "expectancy": -0.09666730728607281,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 810,
+        "tradesAllowed": 27,
+        "tradesBlocked": 67,
+        "winRate": 63.63636363636363
+      },
+      "weak_uptrend": {
+        "candles": 4319,
+        "tradesAllowed": 142,
+        "tradesBlocked": 612,
+        "winRate": 47.524752475247524
+      },
+      "strong_downtrend": {
+        "candles": 1146,
+        "tradesAllowed": 19,
+        "tradesBlocked": 15,
+        "winRate": 69.23076923076923
+      },
+      "weak_downtrend": {
+        "candles": 4809,
+        "tradesAllowed": 119,
+        "tradesBlocked": 224,
+        "winRate": 50
+      },
+      "ranging": {
+        "candles": 3152,
+        "tradesAllowed": 88,
+        "tradesBlocked": 381,
+        "winRate": 36.231884057971016
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 84,
+      "tradesRejectedByRR": 554,
+      "tradesRejectedByVolume": 56,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 380,
+      "tradesRejectedByDailyLimit": 580,
+      "tradesRejectedByWeeklyLimit": 1448,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 1243,
+      "tradesRejectedByValidation": 126,
+      "tradesRejectedByPatternLogic": 8189,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1283
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 120,
+    "totalSignals": 1986,
+    "winRate": 62.18487394957983,
+    "profitFactor": 1.8784741961471205,
+    "totalReturn": 94.11404044034062,
+    "finalCapital": 194114.0404403406,
+    "startingCapital": 100000,
+    "maxDrawdown": 14.180466867363261,
+    "sharpeRatio": 4.040197838488462,
+    "expectancy": 0.2553296097865003,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 198,
+        "tradesAllowed": 32,
+        "tradesBlocked": 15,
+        "winRate": 65
+      },
+      "weak_uptrend": {
+        "candles": 914,
+        "tradesAllowed": 99,
+        "tradesBlocked": 100,
+        "winRate": 59.57446808510638
+      },
+      "strong_downtrend": {
+        "candles": 349,
+        "tradesAllowed": 8,
+        "tradesBlocked": 0,
+        "winRate": 100
+      },
+      "weak_downtrend": {
+        "candles": 1431,
+        "tradesAllowed": 61,
+        "tradesBlocked": 53,
+        "winRate": 56.75675675675676
+      },
+      "ranging": {
+        "candles": 264,
+        "tradesAllowed": 19,
+        "tradesBlocked": 17,
+        "winRate": 66.66666666666666
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 25,
+      "tradesRejectedByRR": 216,
+      "tradesRejectedByVolume": 39,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 80,
+      "tradesRejectedByDailyLimit": 52,
+      "tradesRejectedByWeeklyLimit": 138,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 146,
+      "tradesRejectedByValidation": 148,
+      "tradesRejectedByPatternLogic": 2192,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 360,
+    "totalSignals": 8343,
+    "winRate": 45.55555555555556,
+    "profitFactor": 1.1514401021020115,
+    "totalReturn": 49.16600588850179,
+    "finalCapital": 149166.0058885018,
+    "startingCapital": 100000,
+    "maxDrawdown": 19.69540631145915,
+    "sharpeRatio": 0.9934651940498775,
+    "expectancy": -0.11957141603725274,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 953,
+        "tradesAllowed": 61,
+        "tradesBlocked": 40,
+        "winRate": 46.51162790697674
+      },
+      "weak_uptrend": {
+        "candles": 4003,
+        "tradesAllowed": 273,
+        "tradesBlocked": 258,
+        "winRate": 42.19653179190752
+      },
+      "strong_downtrend": {
+        "candles": 1453,
+        "tradesAllowed": 20,
+        "tradesBlocked": 9,
+        "winRate": 54.54545454545454
+      },
+      "weak_downtrend": {
+        "candles": 5507,
+        "tradesAllowed": 136,
+        "tradesBlocked": 120,
+        "winRate": 56.00000000000001
+      },
+      "ranging": {
+        "candles": 2159,
+        "tradesAllowed": 93,
+        "tradesBlocked": 106,
+        "winRate": 39.6551724137931
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 58,
+      "tradesRejectedByRR": 754,
+      "tradesRejectedByVolume": 61,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 600,
+      "tradesRejectedByDailyLimit": 468,
+      "tradesRejectedByWeeklyLimit": 1250,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 472,
+      "tradesRejectedByValidation": 279,
+      "tradesRejectedByPatternLogic": 8553,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1220
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 102,
+    "totalSignals": 2167,
+    "winRate": 63.725490196078425,
+    "profitFactor": 1.528440204317154,
+    "totalReturn": 45.07408870410497,
+    "finalCapital": 145074.08870410497,
+    "startingCapital": 100000,
+    "maxDrawdown": 9.027295060283723,
+    "sharpeRatio": 2.8287620160937332,
+    "expectancy": 0.1888212019348875,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 233,
+        "tradesAllowed": 35,
+        "tradesBlocked": 6,
+        "winRate": 61.904761904761905
+      },
+      "weak_uptrend": {
+        "candles": 962,
+        "tradesAllowed": 106,
+        "tradesBlocked": 77,
+        "winRate": 68.62745098039215
+      },
+      "strong_downtrend": {
+        "candles": 443,
+        "tradesAllowed": 7,
+        "tradesBlocked": 5,
+        "winRate": 100
+      },
+      "weak_downtrend": {
+        "candles": 1621,
+        "tradesAllowed": 53,
+        "tradesBlocked": 52,
+        "winRate": 54.166666666666664
+      },
+      "ranging": {
+        "candles": 232,
+        "tradesAllowed": 22,
+        "tradesBlocked": 15,
+        "winRate": 50
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 18,
+      "tradesRejectedByRR": 276,
+      "tradesRejectedByVolume": 38,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 52,
+      "tradesRejectedByDailyLimit": 31,
+      "tradesRejectedByWeeklyLimit": 0,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 117,
+      "tradesRejectedByValidation": 304,
+      "tradesRejectedByPatternLogic": 2553,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 361,
+    "totalSignals": 9419,
+    "winRate": 35.55555555555556,
+    "profitFactor": 0.718574128937665,
+    "totalReturn": -31.921584923488233,
+    "finalCapital": 68078.41507651177,
+    "startingCapital": 100000,
+    "maxDrawdown": 33.88868840399286,
+    "sharpeRatio": -1.8644456885790788,
+    "expectancy": -0.33359668735101927,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 392,
+        "tradesAllowed": 19,
+        "tradesBlocked": 63,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 2186,
+        "tradesAllowed": 91,
+        "tradesBlocked": 332,
+        "winRate": 30.76923076923077
+      },
+      "strong_downtrend": {
+        "candles": 205,
+        "tradesAllowed": 8,
+        "tradesBlocked": 1,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 2397,
+        "tradesAllowed": 81,
+        "tradesBlocked": 89,
+        "winRate": 40.98360655737705
+      },
+      "ranging": {
+        "candles": 7262,
+        "tradesAllowed": 250,
+        "tradesBlocked": 403,
+        "winRate": 34.46601941747573
+      },
+      "low_volatility": {
+        "candles": 778,
+        "tradesAllowed": 0,
+        "tradesBlocked": 778,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 82,
+      "tradesRejectedByRR": 433,
+      "tradesRejectedByVolume": 93,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 520,
+      "tradesRejectedByDailyLimit": 107,
+      "tradesRejectedByWeeklyLimit": 397,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 1254,
+      "tradesRejectedByScore": 795,
+      "tradesRejectedByValidation": 729,
+      "tradesRejectedByPatternLogic": 6306,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1365
+    },
+    "totalCandles": 17664
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 136,
+    "totalSignals": 2069,
+    "winRate": 40,
+    "profitFactor": 0.5874970938431169,
+    "totalReturn": -24.931978705969435,
+    "finalCapital": 75068.02129403056,
+    "startingCapital": 100000,
+    "maxDrawdown": 33.04385266693893,
+    "sharpeRatio": -3.058748115353815,
+    "expectancy": -0.29073951541103765,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 175,
+        "tradesAllowed": 12,
+        "tradesBlocked": 11,
+        "winRate": 20
+      },
+      "weak_uptrend": {
+        "candles": 913,
+        "tradesAllowed": 60,
+        "tradesBlocked": 128,
+        "winRate": 46.34146341463415
+      },
+      "strong_downtrend": {
+        "candles": 115,
+        "tradesAllowed": 2,
+        "tradesBlocked": 4,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 794,
+        "tradesAllowed": 39,
+        "tradesBlocked": 37,
+        "winRate": 48.148148148148145
+      },
+      "ranging": {
+        "candles": 905,
+        "tradesAllowed": 71,
+        "tradesBlocked": 76,
+        "winRate": 33.92857142857143
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 31,
+      "tradesRejectedByRR": 316,
+      "tradesRejectedByVolume": 27,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 220,
+      "tradesRejectedByDailyLimit": 13,
+      "tradesRejectedByWeeklyLimit": 70,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 15,
+      "tradesRejectedByScore": 229,
+      "tradesRejectedByValidation": 65,
+      "tradesRejectedByPatternLogic": 1780,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4416
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 273,
+    "totalSignals": 9884,
+    "winRate": 39.1941391941392,
+    "profitFactor": 0.6935540194467203,
+    "totalReturn": -31.197149751366204,
+    "finalCapital": 68802.8502486338,
+    "startingCapital": 100000,
+    "maxDrawdown": 34.832899780581485,
+    "sharpeRatio": -2.0819926036462815,
+    "expectancy": -0.2718418883883616,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 462,
+        "tradesAllowed": 12,
+        "tradesBlocked": 96,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 3089,
+        "tradesAllowed": 64,
+        "tradesBlocked": 788,
+        "winRate": 40.909090909090914
+      },
+      "strong_downtrend": {
+        "candles": 279,
+        "tradesAllowed": 6,
+        "tradesBlocked": 3,
+        "winRate": 40
+      },
+      "weak_downtrend": {
+        "candles": 3345,
+        "tradesAllowed": 76,
+        "tradesBlocked": 156,
+        "winRate": 37.03703703703704
+      },
+      "ranging": {
+        "candles": 6751,
+        "tradesAllowed": 196,
+        "tradesBlocked": 612,
+        "winRate": 38.88888888888889
+      },
+      "low_volatility": {
+        "candles": 405,
+        "tradesAllowed": 0,
+        "tradesBlocked": 405,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 78,
+      "tradesRejectedByRR": 371,
+      "tradesRejectedByVolume": 54,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 360,
+      "tradesRejectedByDailyLimit": 181,
+      "tradesRejectedByWeeklyLimit": 798,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 775,
+      "tradesRejectedByScore": 1601,
+      "tradesRejectedByValidation": 459,
+      "tradesRejectedByPatternLogic": 7664,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1312
+    },
+    "totalCandles": 17664
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 118,
+    "totalSignals": 2373,
+    "winRate": 44.44444444444444,
+    "profitFactor": 1.0332870558401481,
+    "totalReturn": 2.180956384282719,
+    "finalCapital": 102180.95638428272,
+    "startingCapital": 100000,
+    "maxDrawdown": 18.49165083288176,
+    "sharpeRatio": 0.20948942590144068,
+    "expectancy": -0.14946089145557512,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 160,
+        "tradesAllowed": 9,
+        "tradesBlocked": 5,
+        "winRate": 57.14285714285714
+      },
+      "weak_uptrend": {
+        "candles": 853,
+        "tradesAllowed": 49,
+        "tradesBlocked": 172,
+        "winRate": 42.42424242424242
+      },
+      "strong_downtrend": {
+        "candles": 133,
+        "tradesAllowed": 5,
+        "tradesBlocked": 4,
+        "winRate": 25
+      },
+      "weak_downtrend": {
+        "candles": 1114,
+        "tradesAllowed": 33,
+        "tradesBlocked": 44,
+        "winRate": 54.54545454545454
+      },
+      "ranging": {
+        "candles": 927,
+        "tradesAllowed": 60,
+        "tradesBlocked": 71,
+        "winRate": 40.38461538461539
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 23,
+      "tradesRejectedByRR": 403,
+      "tradesRejectedByVolume": 37,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 120,
+      "tradesRejectedByDailyLimit": 19,
+      "tradesRejectedByWeeklyLimit": 0,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 8,
+      "tradesRejectedByScore": 259,
+      "tradesRejectedByValidation": 58,
+      "tradesRejectedByPatternLogic": 2142,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4416
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 335,
+    "totalSignals": 8685,
+    "winRate": 37.91044776119403,
+    "profitFactor": 0.7082615807845061,
+    "totalReturn": -32.6527975375258,
+    "finalCapital": 67347.2024624742,
+    "startingCapital": 100000,
+    "maxDrawdown": 38.399366450489666,
+    "sharpeRatio": -1.9216469935672171,
+    "expectancy": -0.30095486494310264,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 989,
+        "tradesAllowed": 32,
+        "tradesBlocked": 73,
+        "winRate": 40.909090909090914
+      },
+      "weak_uptrend": {
+        "candles": 4796,
+        "tradesAllowed": 159,
+        "tradesBlocked": 624,
+        "winRate": 39.42307692307692
+      },
+      "strong_downtrend": {
+        "candles": 603,
+        "tradesAllowed": 19,
+        "tradesBlocked": 14,
+        "winRate": 46.15384615384615
+      },
+      "weak_downtrend": {
+        "candles": 4611,
+        "tradesAllowed": 129,
+        "tradesBlocked": 130,
+        "winRate": 48.80952380952381
+      },
+      "ranging": {
+        "candles": 2848,
+        "tradesAllowed": 136,
+        "tradesBlocked": 199,
+        "winRate": 26.785714285714285
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 69,
+      "tradesRejectedByRR": 739,
+      "tradesRejectedByVolume": 130,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 623,
+      "tradesRejectedByDailyLimit": 249,
+      "tradesRejectedByWeeklyLimit": 1392,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 910,
+      "tradesRejectedByValidation": 124,
+      "tradesRejectedByPatternLogic": 8089,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1187
+    },
+    "totalCandles": 17664
+  },
+  {
+    "windowId": 5,
+    "windowLabel": "Choppy: Jul 2023 - Dec 2023",
+    "handPickedRegime": "choppy",
+    "start": "2023-07-01",
+    "end": "2023-12-31",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 107,
+    "totalSignals": 2297,
+    "winRate": 57.009345794392516,
+    "profitFactor": 1.2734912687894244,
+    "totalReturn": 27.252026034477677,
+    "finalCapital": 127252.02603447768,
+    "startingCapital": 100000,
+    "maxDrawdown": 13.439419752679038,
+    "sharpeRatio": 1.7452130302789763,
+    "expectancy": 0.08587521000255066,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 365,
+        "tradesAllowed": 15,
+        "tradesBlocked": 28,
+        "winRate": 71.42857142857143
+      },
+      "weak_uptrend": {
+        "candles": 1379,
+        "tradesAllowed": 81,
+        "tradesBlocked": 179,
+        "winRate": 57.14285714285714
+      },
+      "strong_downtrend": {
+        "candles": 172,
+        "tradesAllowed": 8,
+        "tradesBlocked": 3,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 1123,
+        "tradesAllowed": 60,
+        "tradesBlocked": 37,
+        "winRate": 53.65853658536586
+      },
+      "ranging": {
+        "candles": 327,
+        "tradesAllowed": 26,
+        "tradesBlocked": 36,
+        "winRate": 60
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 24,
+      "tradesRejectedByRR": 367,
+      "tradesRejectedByVolume": 74,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 20,
+      "tradesRejectedByDailyLimit": 46,
+      "tradesRejectedByWeeklyLimit": 48,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 209,
+      "tradesRejectedByValidation": 245,
+      "tradesRejectedByPatternLogic": 2226,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4416
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "BTCUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 423,
+    "totalSignals": 8792,
+    "winRate": 37.35224586288416,
+    "profitFactor": 0.6847220713175388,
+    "totalReturn": -32.68164789150422,
+    "finalCapital": 67318.35210849578,
+    "startingCapital": 100000,
+    "maxDrawdown": 39.33989027827896,
+    "sharpeRatio": -2.056792238929816,
+    "expectancy": -0.3161412312440373,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 457,
+        "tradesAllowed": 39,
+        "tradesBlocked": 22,
+        "winRate": 36.11111111111111
+      },
+      "weak_uptrend": {
+        "candles": 3144,
+        "tradesAllowed": 173,
+        "tradesBlocked": 261,
+        "winRate": 37.333333333333336
+      },
+      "strong_downtrend": {
+        "candles": 719,
+        "tradesAllowed": 13,
+        "tradesBlocked": 6,
+        "winRate": 71.42857142857143
+      },
+      "weak_downtrend": {
+        "candles": 3790,
+        "tradesAllowed": 84,
+        "tradesBlocked": 106,
+        "winRate": 52.63157894736842
+      },
+      "ranging": {
+        "candles": 4850,
+        "tradesAllowed": 198,
+        "tradesBlocked": 343,
+        "winRate": 31.213872832369944
+      },
+      "low_volatility": {
+        "candles": 63,
+        "tradesAllowed": 0,
+        "tradesBlocked": 63,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 65,
+      "tradesRejectedByRR": 643,
+      "tradesRejectedByVolume": 104,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 600,
+      "tradesRejectedByDailyLimit": 25,
+      "tradesRejectedByWeeklyLimit": 716,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 228,
+      "tradesRejectedByScore": 634,
+      "tradesRejectedByValidation": 326,
+      "tradesRejectedByPatternLogic": 7725,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1471
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 109,
+    "totalSignals": 2209,
+    "winRate": 49.54128440366973,
+    "profitFactor": 1.3638946265037475,
+    "totalReturn": 29.15574347532616,
+    "finalCapital": 129155.74347532616,
+    "startingCapital": 100000,
+    "maxDrawdown": 8.3771010052252,
+    "sharpeRatio": 1.9900792710901576,
+    "expectancy": -0.04553322144288169,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 173,
+        "tradesAllowed": 14,
+        "tradesBlocked": 15,
+        "winRate": 58.333333333333336
+      },
+      "weak_uptrend": {
+        "candles": 1036,
+        "tradesAllowed": 81,
+        "tradesBlocked": 181,
+        "winRate": 44.44444444444444
+      },
+      "strong_downtrend": {
+        "candles": 248,
+        "tradesAllowed": 2,
+        "tradesBlocked": 9,
+        "winRate": 100
+      },
+      "weak_downtrend": {
+        "candles": 1284,
+        "tradesAllowed": 32,
+        "tradesBlocked": 72,
+        "winRate": 52.17391304347826
+      },
+      "ranging": {
+        "candles": 477,
+        "tradesAllowed": 35,
+        "tradesBlocked": 39,
+        "winRate": 50
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 22,
+      "tradesRejectedByRR": 337,
+      "tradesRejectedByVolume": 56,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 100,
+      "tradesRejectedByDailyLimit": 15,
+      "tradesRejectedByWeeklyLimit": 0,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 260,
+      "tradesRejectedByValidation": 60,
+      "tradesRejectedByPatternLogic": 2259,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 291,
+    "totalSignals": 9699,
+    "winRate": 42.61168384879725,
+    "profitFactor": 0.754754272403315,
+    "totalReturn": -27.41897329813339,
+    "finalCapital": 72581.0267018666,
+    "startingCapital": 100000,
+    "maxDrawdown": 31.21543011414874,
+    "sharpeRatio": -1.6709690276710016,
+    "expectancy": -0.19096213781408317,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 665,
+        "tradesAllowed": 21,
+        "tradesBlocked": 111,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 4476,
+        "tradesAllowed": 107,
+        "tradesBlocked": 863,
+        "winRate": 47.2972972972973
+      },
+      "strong_downtrend": {
+        "candles": 672,
+        "tradesAllowed": 8,
+        "tradesBlocked": 8,
+        "winRate": 50
+      },
+      "weak_downtrend": {
+        "candles": 4379,
+        "tradesAllowed": 82,
+        "tradesBlocked": 199,
+        "winRate": 42.62295081967213
+      },
+      "ranging": {
+        "candles": 4069,
+        "tradesAllowed": 159,
+        "tradesBlocked": 460,
+        "winRate": 39.130434782608695
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 81,
+      "tradesRejectedByRR": 481,
+      "tradesRejectedByVolume": 62,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 440,
+      "tradesRejectedByDailyLimit": 128,
+      "tradesRejectedByWeeklyLimit": 965,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 11,
+      "tradesRejectedByScore": 1579,
+      "tradesRejectedByValidation": 171,
+      "tradesRejectedByPatternLogic": 8653,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1399
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "ETHUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 117,
+    "totalSignals": 2004,
+    "winRate": 47.008547008547005,
+    "profitFactor": 0.9847002040193203,
+    "totalReturn": -1.2338213826804132,
+    "finalCapital": 98766.17861731959,
+    "startingCapital": 100000,
+    "maxDrawdown": 17.82006128284789,
+    "sharpeRatio": -0.0598277065758446,
+    "expectancy": -0.1107386764509194,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 194,
+        "tradesAllowed": 18,
+        "tradesBlocked": 21,
+        "winRate": 31.25
+      },
+      "weak_uptrend": {
+        "candles": 1009,
+        "tradesAllowed": 72,
+        "tradesBlocked": 126,
+        "winRate": 44
+      },
+      "strong_downtrend": {
+        "candles": 245,
+        "tradesAllowed": 3,
+        "tradesBlocked": 5,
+        "winRate": 33.33333333333333
+      },
+      "weak_downtrend": {
+        "candles": 1246,
+        "tradesAllowed": 42,
+        "tradesBlocked": 73,
+        "winRate": 65.51724137931035
+      },
+      "ranging": {
+        "candles": 432,
+        "tradesAllowed": 32,
+        "tradesBlocked": 37,
+        "winRate": 42.10526315789473
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 22,
+      "tradesRejectedByRR": 320,
+      "tradesRejectedByVolume": 52,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 160,
+      "tradesRejectedByDailyLimit": 44,
+      "tradesRejectedByWeeklyLimit": 87,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 210,
+      "tradesRejectedByValidation": 59,
+      "tradesRejectedByPatternLogic": 2055,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "SOLUSDT",
+    "timeframe": "15m",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 380,
+    "totalSignals": 7369,
+    "winRate": 45.11873350923483,
+    "profitFactor": 1.2272271646463329,
+    "totalReturn": 59.51169532259105,
+    "finalCapital": 159511.69532259105,
+    "startingCapital": 100000,
+    "maxDrawdown": 21.953703323227373,
+    "sharpeRatio": 1.1460477820078525,
+    "expectancy": -0.14499608580632134,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 841,
+        "tradesAllowed": 47,
+        "tradesBlocked": 46,
+        "winRate": 60.526315789473685
+      },
+      "weak_uptrend": {
+        "candles": 4077,
+        "tradesAllowed": 200,
+        "tradesBlocked": 316,
+        "winRate": 37.878787878787875
+      },
+      "strong_downtrend": {
+        "candles": 1097,
+        "tradesAllowed": 16,
+        "tradesBlocked": 6,
+        "winRate": 62.5
+      },
+      "weak_downtrend": {
+        "candles": 4720,
+        "tradesAllowed": 126,
+        "tradesBlocked": 116,
+        "winRate": 51.21951219512195
+      },
+      "ranging": {
+        "candles": 2579,
+        "tradesAllowed": 146,
+        "tradesBlocked": 121,
+        "winRate": 42.5
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 60,
+      "tradesRejectedByRR": 692,
+      "tradesRejectedByVolume": 112,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 480,
+      "tradesRejectedByDailyLimit": 440,
+      "tradesRejectedByWeeklyLimit": 1654,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 493,
+      "tradesRejectedByValidation": 196,
+      "tradesRejectedByPatternLogic": 7759,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 1048
+    },
+    "totalCandles": 17568
+  },
+  {
+    "windowId": 6,
+    "windowLabel": "Choppy: Apr 2024 - Sep 2024",
+    "handPickedRegime": "choppy",
+    "start": "2024-04-01",
+    "end": "2024-09-30",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 96,
+    "totalSignals": 2253,
+    "winRate": 66.3157894736842,
+    "profitFactor": 1.8051753352419897,
+    "totalReturn": 72.65579194440733,
+    "finalCapital": 172655.79194440733,
+    "startingCapital": 100000,
+    "maxDrawdown": 8.159747974674994,
+    "sharpeRatio": 4.109268630078479,
+    "expectancy": 0.31231787864076077,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 320,
+        "tradesAllowed": 19,
+        "tradesBlocked": 31,
+        "winRate": 63.63636363636363
+      },
+      "weak_uptrend": {
+        "candles": 1110,
+        "tradesAllowed": 96,
+        "tradesBlocked": 93,
+        "winRate": 60.46511627906976
+      },
+      "strong_downtrend": {
+        "candles": 370,
+        "tradesAllowed": 9,
+        "tradesBlocked": 4,
+        "winRate": 80
+      },
+      "weak_downtrend": {
+        "candles": 1365,
+        "tradesAllowed": 44,
+        "tradesBlocked": 87,
+        "winRate": 73.91304347826086
+      },
+      "ranging": {
+        "candles": 287,
+        "tradesAllowed": 23,
+        "tradesBlocked": 10,
+        "winRate": 64.28571428571429
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 15,
+      "tradesRejectedByRR": 436,
+      "tradesRejectedByVolume": 42,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 40,
+      "tradesRejectedByDailyLimit": 49,
+      "tradesRejectedByWeeklyLimit": 0,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 183,
+      "tradesRejectedByValidation": 130,
+      "tradesRejectedByPatternLogic": 2461,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  },
+  {
+    "windowId": 4,
+    "windowLabel": "Bear: Apr 2022 - Sep 2022",
+    "handPickedRegime": "bear",
+    "start": "2022-04-01",
+    "end": "2022-09-30",
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "scoreFloor": 60,
+    "condition": "baseline-rerun",
+    "totalTrades": 96,
+    "totalSignals": 2064,
+    "winRate": 50,
+    "profitFactor": 1.4157316005432834,
+    "totalReturn": 29.352204949472405,
+    "finalCapital": 129352.2049494724,
+    "startingCapital": 100000,
+    "maxDrawdown": 10.195295467090814,
+    "sharpeRatio": 2.2863912621694595,
+    "expectancy": -0.01994705624008608,
+    "regimeBreakdown": {
+      "strong_uptrend": {
+        "candles": 142,
+        "tradesAllowed": 20,
+        "tradesBlocked": 14,
+        "winRate": 50
+      },
+      "weak_uptrend": {
+        "candles": 796,
+        "tradesAllowed": 75,
+        "tradesBlocked": 73,
+        "winRate": 51.35135135135135
+      },
+      "strong_downtrend": {
+        "candles": 365,
+        "tradesAllowed": 11,
+        "tradesBlocked": 2,
+        "winRate": 0
+      },
+      "weak_downtrend": {
+        "candles": 1524,
+        "tradesAllowed": 52,
+        "tradesBlocked": 49,
+        "winRate": 57.692307692307686
+      },
+      "ranging": {
+        "candles": 426,
+        "tradesAllowed": 31,
+        "tradesBlocked": 28,
+        "winRate": 42.10526315789473
+      },
+      "low_volatility": {
+        "candles": 0,
+        "tradesAllowed": 0,
+        "tradesBlocked": 0,
+        "winRate": 0
+      }
+    },
+    "rejections": {
+      "tradesRejectedByEntry": 20,
+      "tradesRejectedByRR": 343,
+      "tradesRejectedByVolume": 17,
+      "tradesRejectedBySession": 0,
+      "tradesRejectedByLossStreak": 140,
+      "tradesRejectedByDailyLimit": 22,
+      "tradesRejectedByWeeklyLimit": 24,
+      "tradesRejectedByRegime": 0,
+      "tradesRejectedByATR": 0,
+      "tradesRejectedByScore": 149,
+      "tradesRejectedByValidation": 105,
+      "tradesRejectedByPatternLogic": 2337,
+      "tradesRejectedByMinConfidence": 0,
+      "tradesRejectedByPatternChoice": 0,
+      "tradesRejectedByHtfDisagreement": 0
+    },
+    "totalCandles": 4392
+  }
+]

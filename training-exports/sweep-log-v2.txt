@@ -1,0 +1,400 @@
+
+=== RUN: BTC 5m last 30d ===
+FINAL CAPITAL
+$71,853
+-$28,147 (-28.1%)
+WIN RATE
+23.2%
+13W / 30L / 4BE
+PROFIT FACTOR
+0.25
+Gross win / gross loss
+MAX DRAWDOWN
+-28.1%
+-$28,147
+SHARPE RATIO
+-9.33
+>1.0 = good
+Equity Curve — $100,000 → $71,853
+📄 Export Full Report
+19 May
+20 May
+23 May
+25 May
+29 May
+4 Jun
+5 Jun
+11 Jun
+11 Jun
+12 Jun
+12 Jun
+15 Jun
+15 Jun
+16 Jun
+18 Jun
+18 Jun
+$68k
+$77k
+$
+
+=== RUN: ETH 5m last 30d ===
+FINAL CAPITAL
+$72,762
+-$27,238 (-27.2%)
+WIN RATE
+30.8%
+20W / 37L / 10BE
+PROFIT FACTOR
+0.48
+Gross win / gross loss
+MAX DRAWDOWN
+-27.2%
+-$27,238
+SHARPE RATIO
+-5.01
+>1.0 = good
+Equity Curve — $100,000 → $72,762
+📄 Export Full Report
+19 May
+20 May
+21 May
+22 May
+23 May
+24 May
+28 May
+4 Jun
+4 Jun
+5 Jun
+6 Jun
+6 Jun
+11 Jun
+12 Jun
+18 Jun
+18 Jun
+$72k
+$80k
+$88
+
+=== RUN: SOL 5m last 30d ===
+FINAL CAPITAL
+$68,421
+-$31,579 (-31.6%)
+WIN RATE
+24.7%
+18W / 45L / 9BE
+PROFIT FACTOR
+0.35
+Gross win / gross loss
+MAX DRAWDOWN
+-31.9%
+-$32,079
+SHARPE RATIO
+-6.82
+>1.0 = good
+Equity Curve — $100,000 → $68,421
+📄 Export Full Report
+19 May
+20 May
+21 May
+22 May
+23 May
+28 May
+29 May
+4 Jun
+4 Jun
+5 Jun
+5 Jun
+11 Jun
+11 Jun
+12 Jun
+18 Jun
+18 Jun
+$68k
+$77k
+$85
+
+=== RUN: BNB 5m last 30d ===
+FINAL CAPITAL
+$73,196
+-$26,804 (-26.8%)
+WIN RATE
+31.0%
+18W / 30L / 7BE
+PROFIT FACTOR
+0.40
+Gross win / gross loss
+MAX DRAWDOWN
+-26.8%
+-$26,804
+SHARPE RATIO
+-6.15
+>1.0 = good
+Equity Curve — $100,000 → $73,196
+📄 Export Full Report
+20 May
+22 May
+25 May
+27 May
+28 May
+30 May
+31 May
+31 May
+31 May
+11 Jun
+11 Jun
+12 Jun
+12 Jun
+15 Jun
+18 Jun
+$72k
+$80k
+$88k
+$
+
+=== RUN: BTC 1h last 120d ===
+FINAL CAPITAL
+$83,488
+-$16,512 (-16.5%)
+WIN RATE
+41.7%
+30W / 38L / 17BE
+PROFIT FACTOR
+0.75
+Gross win / gross loss
+MAX DRAWDOWN
+-28.3%
+-$32,925
+SHARPE RATIO
+-2.09
+>1.0 = good
+Equity Curve — $100,000 → $83,488
+📄 Export Full Report
+1 Mar
+15 Mar
+21 Mar
+31 Mar
+6 Apr
+7 Apr
+17 Apr
+20 Apr
+26 Apr
+7 May
+12 May
+19 May
+30 May
+9 Jun
+13 Jun
+17 Jun
+$81k
+$90k
+$99
+
+=== RUN: ETH 1h last 120d ===
+FINAL CAPITAL
+$97,878
+-$2,122 (-2.1%)
+WIN RATE
+53.4%
+31W / 25L / 13BE
+PROFIT FACTOR
+0.95
+Gross win / gross loss
+MAX DRAWDOWN
+-11.6%
+-$11,560
+SHARPE RATIO
+-0.29
+>1.0 = good
+Equity Curve — $100,000 → $97,878
+📄 Export Full Report
+25 Feb
+9 Mar
+22 Mar
+30 Mar
+6 Apr
+9 Apr
+14 Apr
+23 Apr
+30 Apr
+12 May
+19 May
+26 May
+9 Jun
+12 Jun
+17 Jun
+18 Jun
+$88k
+$91k
+$95k
+
+=== RUN: BTC 5m 60-90d ago ===
+FINAL CAPITAL
+$78,715
+-$21,285 (-21.3%)
+WIN RATE
+40.4%
+36W / 39L / 11BE
+PROFIT FACTOR
+0.63
+Gross win / gross loss
+MAX DRAWDOWN
+-23.8%
+-$23,834
+SHARPE RATIO
+-2.90
+>1.0 = good
+Equity Curve — $100,000 → $78,715
+📄 Export Full Report
+● Best trade: $3,844 Bearish Engulfing
+● Worst trade: -$2,013 Morning Star
+Max drawdown: -23.8%
+Rules Applied This Run
+E
+
+=== RUN: ETH 5m 60-90d ago ===
+FINAL CAPITAL
+$72,846
+-$27,154 (-27.2%)
+WIN RATE
+26.4%
+14W / 33L / 5BE
+PROFIT FACTOR
+0.34
+Gross win / gross loss
+MAX DRAWDOWN
+-27.2%
+-$27,154
+SHARPE RATIO
+-7.30
+>1.0 = good
+Equity Curve — $100,000 → $72,846
+📄 Export Full Report
+22 Mar
+26 Mar
+27 Mar
+27 Mar
+28 Mar
+2 Apr
+3 Apr
+5 Apr
+9 Apr
+10 Apr
+11 Apr
+17 Apr
+17 Apr
+18 Apr
+18 Apr
+18 Apr
+$72k
+$80k
+$88
+
+=== ALL RUNS (POST-FIX) ===
+[
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "BTC 5m last 30d",
+    "returnPct": "-28.1",
+    "winRate": "23.2",
+    "profitFactor": "0.25",
+    "wins": "13",
+    "losses": "30",
+    "breakevens": "4"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "ETH 5m last 30d",
+    "returnPct": "-27.2",
+    "winRate": "30.8",
+    "profitFactor": "0.48",
+    "wins": "20",
+    "losses": "37",
+    "breakevens": "10"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "SOL 5m last 30d",
+    "returnPct": "-31.6",
+    "winRate": "24.7",
+    "profitFactor": "0.35",
+    "wins": "18",
+    "losses": "45",
+    "breakevens": "9"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "BNB 5m last 30d",
+    "returnPct": "-26.8",
+    "winRate": "31.0",
+    "profitFactor": "0.40",
+    "wins": "18",
+    "losses": "30",
+    "breakevens": "7"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "BTC 1h last 120d",
+    "returnPct": "-16.5",
+    "winRate": "41.7",
+    "profitFactor": "0.75",
+    "wins": "30",
+    "losses": "38",
+    "breakevens": "17"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T16:27:25.376Z",
+    "end": "2026-06-18T16:27:25.376Z",
+    "label": "ETH 1h last 120d",
+    "returnPct": "-2.1",
+    "winRate": "53.4",
+    "profitFactor": "0.95",
+    "wins": "31",
+    "losses": "25",
+    "breakevens": "13"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T16:27:25.376Z",
+    "end": "2026-04-19T16:27:25.376Z",
+    "label": "BTC 5m 60-90d ago",
+    "returnPct": "-21.3",
+    "winRate": "40.4",
+    "profitFactor": "0.63",
+    "wins": "36",
+    "losses": "39",
+    "breakevens": "11"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T16:27:25.376Z",
+    "end": "2026-04-19T16:27:25.376Z",
+    "label": "ETH 5m 60-90d ago",
+    "returnPct": "-27.2",
+    "winRate": "26.4",
+    "profitFactor": "0.34",
+    "wins": "14",
+    "losses": "33",
+    "breakevens": "5"
+  }
+]
+Saved fresh backup v2
+DONE

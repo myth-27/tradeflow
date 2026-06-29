@@ -1,0 +1,106 @@
+Started at 2026-06-19T14:03:38.842Z — HELD-OUT TEST: ADA+XRP only, 15m/1h/4h (no 5m), random dates over last 10 years
+[t+15s] Run 1/20: ADAUSDT 15m Random 2023-02-27 → 2023-04-17
+[t+60s] Run 3/20: XRPUSDT 15m Random 2021-04-12 → 2021-05-21
+[t+75s] Run 4/20: ADAUSDT 15m Random 2024-04-23 → 2024-05-24
+[t+90s] Run 8/20: XRPUSDT 15m Random 2026-02-08 → 2026-03-11
+[t+105s] Run 7/20: XRPUSDT 4h Random 2023-11-17 → 2024-02-09
+[t+120s] Run 11/20: ADAUSDT 4h Random 2018-03-15 → 2018-05-05
+[t+135s] Run 13/20: XRPUSDT 15m Random 2022-01-07 → 2022-03-03
+[t+150s] Run 15/20: ADAUSDT 15m Random 2022-09-24 → 2022-10-29
+
+=== COMPLETE ===
+What the system learned from 17 runs
+7/17 profitable (41%) — avg return +7.8%
+✓ What Works
+Bull Flag (67% WR) — seen in 1 run(s)
+Head & Shoulders (87% WR) — seen in 1 run(s)
+Bearish Engulfing (71% WR) — seen in 1 run(s)
+Bullish Engulfing (75% WR) — seen in 1 run(s)
+Head & Shoulders (63% WR) — seen in 1 run(s)
+Head & Shoulders (75% WR) — seen in 1 run(s)
+Head & Shoulders (100% WR) — seen in 1 run(s)
+Hammer (80% WR) — seen in 1 run(s)
+✗ What to Avoid
+Double Top (0% WR) — seen in 1 run(s)
+Double Bottom (0% WR) — seen in 1 run(s)
+Double Bottom (27% WR) — seen in 1 run(s)
+Per-Run Diagnosis
+ADAUSDT 15m — Random 2023-02-27 → 2023-04-17
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+ADAUSDT 15m — Random 2023-08-26 → 2023-11-18
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2021-04-12 → 2021-05-21
++91.0% · WR 75% · PF 4.37
+💰 Profitable run (+91.0%) — Random 2021-04-12 → 2021-05-21 suited this strategy
+✓ Bull Flag worked well: 67% win rate, 6 trades
+✓ Head & Shoulders worked well: 87% win rate, 15 trades
+✓ Bearish Engulfing worked well: 71% win rate, 7 trades
+✓ Bullish Engulfing worked well: 75% win rate, 4 trades
+ADAUSDT 15m — Random 2024-04-23 → 2024-05-24
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+ADAUSDT 15m — Random 2019-08-11 → 2019-10-10
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2021-10-21 → 2021-11-30
++5.2% · WR 50% · PF 1.20
+💰 Profitable run (+5.2%) — Random 2021-10-21 → 2021-11-30 suited this strategy
+✗ Double Top struggled: only 0% win rate in Random 2021-10-21 → 2021-11-30 — likely wrong regime fit
+✓ Head & Shoulders worked well: 63% win rate, 16 trades
+XRPUSDT 4h — Random 2023-11-17 → 2024-02-09
+-0.2% · WR 0% · PF 0.00
+Result: -0.2% over 1 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2026-02-08 → 2026-03-11
++0.7% · WR 46% · PF 1.03
+✗ Double Bottom struggled: only 0% win rate in Random 2026-02-08 → 2026-03-11 — likely wrong regime fit
+✓ Head & Shoulders worked well: 75% win rate, 12 trades
+XRPUSDT 4h — Random 2018-05-22 → 2018-06-22
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2020-01-23 → 2020-04-08
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+ADAUSDT 1h — Random 2018-06-09 → 2018-07-25
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2022-01-07 → 2022-03-03
++6.1% · WR 59% · PF 1.45
+💰 Profitable run (+6.1%) — Random 2022-01-07 → 2022-03-03 suited this strategy
+ADAUSDT 15m — Random 2022-06-20 → 2022-07-27
++7.1% · WR 100% · PF 9.99
+💰 Profitable run (+7.1%) — Random 2022-06-20 → 2022-07-27 suited this strategy
+✓ Head & Shoulders worked well: 100% win rate, 3 trades
+ADAUSDT 15m — Random 2022-09-24 → 2022-10-29
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+XRPUSDT 15m — Random 2025-05-07 → 2025-07-28
++21.8% · WR 53% · PF 1.28
+💰 Profitable run (+21.8%) — Random 2025-05-07 → 2025-07-28 suited this strategy
+✗ Double Bottom struggled: only 27% win rate in Random 2025-05-07 → 2025-07-28 — likely wrong regime fit
+✓ Hammer worked well: 80% win rate, 5 trades
+✓ Morning Star worked well: 80% win rate, 10 trades
+✓ Shooting Star worked well: 75% win rate, 4 trades
+ADAUSDT 4h — Random 2023-09-13 → 2023-10-26
++0.0% · WR 0% · PF 0.00
+Result: +0.0% over 0 trades — no strong pattern-level signal either way
+ADAUSDT 15m — Random 2025-05-14 → 2025-06-20
++1.3% · WR 75% · PF 1.56
+Result: +1.3% over 4 trades — no strong pattern-level signal either way
+Run Another Batch
+History (last 20 runs)
+SYMBOL	TF	PERIOD	TRADES	WIN RATE	PF	RETURN
+ADAUSDT	15m	Random 2025-05-14 → 2025-06-20	4	75%	1.56	+1.3%
+ADAUSDT	4h	Random 2023-09-13 → 2023-10-26	0	0%	0.00	+0.0%
+XRPUSDT	15m	Random 2025-05-07 → 2025-07-28	114	53%	1.28	+21.8%
+ADAUSDT	15m	Random 2022-09-24 → 2022-10-29	0	0%	0.00	+0.0%
+ADAUSDT	15m	Random 2022-06-20 → 2022-07-27	3	100%	9.99	+7.1%
+XRPUSDT	15m	Random 2022-01-07 → 2022-03-03	22	59%	1.45	+6.1%
+ADAUSDT	1h	Random 2018-06-09 → 2018-07-25	0	0%	0.00	+0.0%
+XRPUSDT	15m	Random 2020-01-23 → 2020-04-08	0	0%	0.00	+0.0%
+XRPUSDT	4h	Random 2018-05-22 → 2018-06-22	0	0%	0.00	+0.0%
+XRPUSDT	15m	Random 2026-02-08 → 2026-03-11	28	46%	1.03	+0.7%
+XRPUSDT	4h
+CONSOLE ERRORS: []
+DONE

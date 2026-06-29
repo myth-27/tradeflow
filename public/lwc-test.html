@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head><title>LWC v5 Test</title></head>
+<body style="background:#0a0a0a;margin:0;padding:20px;">
+<div id="chart" style="width:800px;height:400px;"></div>
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+  width: 800, height: 400,
+  layout: { background: { color: '#0a0a0a' }, textColor: '#888' },
+});
+const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
+  upColor: '#22c55e', downColor: '#ef4444',
+  borderUpColor: '#22c55e', borderDownColor: '#ef4444',
+  wickUpColor: '#22c55e', wickDownColor: '#ef4444',
+});
+const data = [];
+let time = 1700000000;
+let price = 65000;
+for (let i = 0; i < 50; i++) {
+  const open = price;
+  const close = price + (Math.random() - 0.5) * 500;
+  const high = Math.max(open, close) + Math.random() * 200;
+  const low = Math.min(open, close) - Math.random() * 200;
+  data.push({ time, open, high, low, close });
+  price = close;
+  time += 300;
+}
+series.setData(data);
+chart.timeScale().fitContent();
+document.title = 'LWC Test - Loaded';
+</script>
+</body>
+</html>

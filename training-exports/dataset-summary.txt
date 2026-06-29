@@ -1,0 +1,80 @@
+📊 ML Training Dataset
+
+Every backtest trade, feature-engineered for model training. Built from 1 stored simulation.
+
+← Back to Simulator
+TRAINING EXAMPLES
+73
+WIN RATE
+5.5%
+AVG R-MULTIPLE
+-1.228
+READY FOR ML
+Not yet
+Dataset Quality Score
+Sample Size
+█░░░░░░░
+73 / 500 target
+Class Balance
+█░░░░░░░
+5.5% wins
+Pattern Variety
+████████
+9 patterns
+Regime Coverage
+███████░
+5 regimes
+Building phase — run more simulations to grow the dataset
+⚠ Only 73 trades — need 500+ for reliable ML training.
+⚠ Class imbalance: only 5% wins. Use class_weight='balanced' in sklearn.
+Feature Columns Preview (first 5 rows)
+PATTERN	RSI	HTF BIAS	VOL RATIO	REGIME	R-MULTIPLE	OUTCOME
+Bearish Engulfing	41	bearish	0.86x	weak_downtrend	+0.00	breakeven
+Ascending Triangle	70	bearish	1.21x	ranging	-0.69	loss
+Ascending Triangle	62	bullish	0.53x	weak_uptrend	+0.00	breakeven
+Ascending Triangle	46	bullish	0.56x	ranging	-5.04	loss
+Double Bottom	46	bearish	0.92x	ranging	-1.88	loss
+Export
+⬇ Download CSV
+⬇ Download JSON
+⬇ Python Notebook
+
+All 48 feature columns included — pattern, indicators, HTF bias proxy, regime, entry quality, streak/drawdown context, plus the outcome and rMultiple labels.
+
+Python Quickstart
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+df = pd.read_csv('tradeflow_training_dataset.csv')
+features = [
+    'patternEncoded', 'direction', 'patternConfidence',
+    'htfBias', 'htfStrength', 'rsi', 'rsiZone',
+    'macdSign', 'macdMomentum', 'atrPct', 'volumeRatio',
+    'highVolume', 'regimeEncoded', 'rrRatio',
+    'distToSupport', 'distToResistance', 'hourUTC',
+    'consecutiveLossesBefore',
+]
+
+X = df[features]
+y = df['outcomeEncoded']  # 1=win, 0=BE, -1=loss
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, shuffle=False  # no shuffle for time series
+)
+
+model = RandomForestClassifier(
+    n_estimators=100, class_weight='balanced', random_state=42
+)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+
+importance = pd.Series(
+    model.feature_importances_, index=features
+).sort_values(ascending=False)
+print(importance.head(10))
+Accumulated Across All Simulations
+Total examples: 73
+Simulations: 1
+Symbols: BTCUSDT
+Timeframes: 5m

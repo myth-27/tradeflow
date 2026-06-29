@@ -1,0 +1,63 @@
+Loaded /auto-sim with default config: BTCUSDT/ETHUSDT/SOLUSDT, 5m/15m/1h, all 9 date ranges, batch size 5, max 20 runs, target PF 1.5
+Started at 2026-06-19T12:40:16.602Z
+[t+15s] Run 1/20: BTCUSDT 1h Q2 2024 Correction
+[t+30s] (no progress line found)
+[t+135s] Run 3/20: SOLUSDT 15m FTX Crash Recovery
+[t+165s] Run 4/20: SOLUSDT 5m 2022 Bear Market
+[t+180s] (no progress line found)
+[t+240s] Run 5/20: ETHUSDT 5m Q1 2023 Recovery
+[t+270s] (no progress line found)
+[t+360s] Run 6/20: SOLUSDT 1h Q3 2023 Sideways
+[t+390s] (no progress line found)
+[t+510s] Run 8/20: SOLUSDT 5m Q3 2024 Range
+[t+525s] (no progress line found)
+[t+630s] Run 9/20: SOLUSDT 15m Q4 2024 Bull Run
+[t+645s] Run 10/20: BTCUSDT 1h Q3 2024 Range
+[t+660s] Run 12/20: ETHUSDT 1h Q1 2023 Recovery
+[t+690s] (no progress line found)
+[t+765s] Run 14/20: SOLUSDT 15m Q3 2023 Sideways
+[t+795s] Run 15/20: ETHUSDT 15m Q4 2024 Bull Run
+[t+810s] Run 16/20: ETHUSDT 5m 2022 Bear Market
+[t+840s] (no progress line found)
+[t+885s] Run 17/20: SOLUSDT 5m Q4 2024 Bull Run
+[t+900s] (no progress line found)
+[t+990s] Run 18/20: BTCUSDT 5m Q4 2023 Bull Start
+[t+1005s] (no progress line found)
+[t+1065s] Run 19/20: ETHUSDT 1h Q1 2024 Strong Bull
+
+=== COMPLETE ===
+What the system learned from 20 runs
+7/20 profitable (35%) — avg return -8.2%
+✓ What Works
+Hammer (67% WR) — seen in 3 run(s)
+Bullish Engulfing (61% WR) — seen in 2 run(s)
+Bullish Engulfing (67% WR) — seen in 2 run(s)
+Morning Star (63% WR) — seen in 2 run(s)
+Head & Shoulders (67% WR) — seen in 1 run(s)
+Morning Star (69% WR) — seen in 1 run(s)
+Bearish Engulfing (64% WR) — seen in 1 run(s)
+Bull Flag (67% WR) — seen in 1 run(s)
+✗ What to Avoid
+Hammer (33% WR) — seen in 4 run(s)
+Double Top (22% WR) — seen in 3 run(s)
+Double Bottom (22% WR) — seen in 3 run(s)
+Double Bottom (25% WR) — seen in 2 run(s)
+Double Top (21% WR) — seen in 2 run(s)
+Hammer (38% WR) — seen in 2 run(s)
+Double Top (26% WR) — seen in 2 run(s)
+Double Top (14% WR) — seen in 2 run(s)
+Per-Run Diagnosis
+BTCUSDT 1h — Q2 2024 Correction
++10.6% · WR 53% · PF 1.28
+💰 Profitable run (+10.6%) — Q2 2024 Correction suited this strategy
+✓ Head & Shoulders worked well: 67% win rate, 21 trades
+✗ Double Bottom struggled: only 14% win rate in Q2 2024 Correction — likely wrong regime fit
+BTCUSDT 5m — Q3 2024 Range
+-30.5% · WR 41% · PF 0.81
+📉 Loss run (-30.5%) — Q3 2024 Range conditions didn't suit the current strategy
+✗ Descending Triangle struggled: only 25% win rate in Q3 2024 Range — likely wrong regime fit
+✗ Bullish Engulfing struggled: only 38% win rate in Q3 2024 Range — likely wrong regime fit
+✗ Double Top struggled: only 25% win rate in Q3 2024 Range — likely wrong regime fit
+✗ Double Bottom struggled: only 34% win rate i
+CONSOLE ERRORS: []
+DONE

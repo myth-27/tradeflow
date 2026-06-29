@@ -1,0 +1,81 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BTC 5m last 30d",
+    "returnPct": "-7.5",
+    "winRate": "45.1",
+    "profitFactor": "0.87",
+    "wins": "37",
+    "losses": "37",
+    "breakevens": "15"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "ETH 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "SOL 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BNB 5m last 30d",
+    "error": "timeout"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "BTC 1h last 120d",
+    "returnPct": "+13.2",
+    "winRate": "52.1",
+    "profitFactor": "1.26",
+    "wins": "37",
+    "losses": "32",
+    "breakevens": "21"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T21:43:57.274Z",
+    "end": "2026-06-18T21:43:57.274Z",
+    "label": "ETH 1h last 120d",
+    "returnPct": "+2.8",
+    "winRate": "54.5",
+    "profitFactor": "1.07",
+    "wins": "30",
+    "losses": "23",
+    "breakevens": "12"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T21:43:57.274Z",
+    "end": "2026-04-19T21:43:57.274Z",
+    "label": "BTC 5m 60-90d ago",
+    "error": "timeout"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T21:43:57.274Z",
+    "end": "2026-04-19T21:43:57.274Z",
+    "label": "ETH 5m 60-90d ago",
+    "error": "timeout"
+  }
+]

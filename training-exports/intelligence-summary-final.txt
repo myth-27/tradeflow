@@ -1,0 +1,80 @@
+🧠 Intelligence Report
+
+Edge registry derived from every live signal and simulated trade — pattern × symbol × timeframe × regime × session.
+
+← Back to Simulator
+Last generated 18/06/2026, 21:46:06
+⬇ Export Full Backup
+↻ Generate Report Now
+OVERALL HEALTH SCORE
+50/100
+Share of active (20+ sample) edges with a profit factor above 1.0.
+Insights
+Not enough data yet — run more simulations (need 20+ trades per pattern/regime/session combo for the first insights).
+🏆 Top Edges
+
+No edges with 20+ samples yet.
+
+📉 Worst Edges
+
+No underperforming edges (PF < 1.0) yet.
+
+All Edge Combinations (214)
+PATTERN	SYMBOL	TF	REGIME	SESSION	TRADES	WIN RATE	PF	STATUS	SOURCE
+Double Bottom	BTCUSDT	5m	ranging	asia	8	13%	0.19	learning	sim
+Ascending Triangle	ETHUSDT	5m	weak_uptrend	asia	7	0%	0.00	learning	sim
+Double Top	BTCUSDT	5m	ranging	asia	6	17%	0.14	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	asia	6	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	1h	weak_uptrend	asia	6	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	asia	5	0%	0.00	learning	sim
+Double Bottom	SOLUSDT	5m	ranging	asia	5	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	asia	5	20%	0.04	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	london	4	0%	0.00	learning	sim
+Double Top	ETHUSDT	5m	ranging	asia	4	25%	9.99	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	london	4	0%	0.00	learning	sim
+Bearish Engulfing	ETHUSDT	5m	ranging	asia	4	25%	1.04	learning	sim
+Ascending Triangle	BNBUSDT	5m	weak_uptrend	asia	4	25%	0.10	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_downtrend	new_york	4	25%	0.14	learning	sim
+Bearish Engulfing	BTCUSDT	1h	weak_downtrend	asia	4	0%	0.00	learning	sim
+Bull Flag	ETHUSDT	1h	weak_uptrend	asia	4	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	asia	4	0%	0.00	learning	sim
+Double Bottom	BTCUSDT	5m	ranging	overlap	3	33%	0.07	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	new_york	3	0%	0.00	learning	sim
+Bearish Engulfing	BTCUSDT	5m	weak_downtrend	overlap	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	ranging	asia	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	london	3	0%	0.00	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	overlap	3	0%	0.00	learning	sim
+Ascending Triangle	ETHUSDT	5m	weak_uptrend	london	3	0%	0.00	learning	sim
+Double Top	ETHUSDT	5m	ranging	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	5m	weak_uptrend	london	3	67%	1.78	learning	sim
+Double Top	SOLUSDT	5m	ranging	london	3	0%	0.00	learning	sim
+Double Top	SOLUSDT	5m	ranging	asia	3	33%	0.32	learning	sim
+Ascending Triangle	SOLUSDT	5m	weak_uptrend	asia	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_uptrend	asia	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	london	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	asia	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	1h	weak_uptrend	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	1h	weak_uptrend	london	3	67%	9.99	learning	sim
+Bearish Engulfing	ETHUSDT	1h	weak_downtrend	asia	3	0%	0.00	learning	sim
+Ascending Triangle	ETHUSDT	1h	ranging	new_york	3	33%	9.99	learning	sim
+Bearish Engulfing	ETHUSDT	1h	weak_downtrend	overlap	3	0%	0.00	learning	sim
+Bearish Engulfing	BTCUSDT	5m	weak_downtrend	asia	2	0%	0.00	learning	sim
+Double Top	BTCUSDT	5m	weak_downtrend	asia	2	0%	0.00	learning	sim
+Shooting Star	BTCUSDT	5m	weak_downtrend	asia	2	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_downtrend	london	2	0%	0.00	learning	sim
+Double Top	ETHUSDT	5m	ranging	london	2	0%	0.00	learning	sim
+Shooting Star	ETHUSDT	5m	weak_downtrend	asia	2	0%	0.00	learning	sim
+Head & Shoulders	SOLUSDT	5m	weak_uptrend	asia	2	0%	0.00	learning	sim
+Ascending Triangle	SOLUSDT	5m	ranging	asia	2	0%	0.00	learning	sim
+Head & Shoulders	SOLUSDT	5m	ranging	asia	2	50%	9.99	learning	sim
+Ascending Triangle	SOLUSDT	5m	strong_uptrend	new_york	2	0%	0.00	learning	sim
+Double Bottom	SOLUSDT	5m	weak_downtrend	asia	2	0%	0.00	learning	sim
+Double Top	BNBUSDT	5m	ranging	overlap	2	0%	0.00	learning	sim
+📸 Candle Snapshot Store
+Total: 364
+Completed: 364
+Wins: 37
+Losses: 195
+
+364 snapshots — run more simulations. Need 136 more for visual ML

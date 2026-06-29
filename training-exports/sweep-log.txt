@@ -1,0 +1,523 @@
+
+=== RUN: BTC 5m last 30d (BTCUSDT 5m, 2026-05-19 to 2026-06-18) ===
+FINAL CAPITAL
+$75,137
+-$24,863 (-24.9%)
+WIN RATE
+7.1%
+3W / 21L / 4BE
+PROFIT FACTOR
+0.09
+Gross win / gross loss
+MAX DRAWDOWN
+-24.9%
+-$24,863
+SHARPE RATIO
+-14.08
+>1.0 = good
+Equity Curve — $100,000 → $75,137
+📄 Export Full Report
+20 May
+20 May
+23 May
+25 May
+28 May
+30 May
+4 Jun
+5 Jun
+11 Jun
+12 Jun
+12 Jun
+12 Jun
+15 Jun
+18 Jun
+18 Jun
+$75k
+$83k
+$90k
+$98k
+
+=== RUN: ETH 5m last 30d (ETHUSDT 5m, 2026-05-19 to 2026-06-18) ===
+FINAL CAPITAL
+$76,739
+-$23,261 (-23.3%)
+WIN RATE
+10.0%
+4W / 23L / 7BE
+PROFIT FACTOR
+0.10
+Gross win / gross loss
+MAX DRAWDOWN
+-23.3%
+-$23,261
+SHARPE RATIO
+-13.86
+>1.0 = good
+Equity Curve — $100,000 → $76,739
+📄 Export Full Report
+19 May
+20 May
+20 May
+21 May
+22 May
+28 May
+4 Jun
+4 Jun
+5 Jun
+6 Jun
+6 Jun
+12 Jun
+18 Jun
+18 Jun
+18 Jun
+$75k
+$83k
+$90k
+$98k
+$
+
+=== RUN: SOL 5m last 30d (SOLUSDT 5m, 2026-05-19 to 2026-06-18) ===
+FINAL CAPITAL
+$77,780
+-$22,220 (-22.2%)
+WIN RATE
+9.3%
+4W / 25L / 6BE
+PROFIT FACTOR
+0.11
+Gross win / gross loss
+MAX DRAWDOWN
+-22.6%
+-$22,720
+SHARPE RATIO
+-13.40
+>1.0 = good
+Equity Curve — $100,000 → $77,780
+📄 Export Full Report
+19 May
+19 May
+21 May
+21 May
+22 May
+28 May
+29 May
+4 Jun
+4 Jun
+4 Jun
+5 Jun
+11 Jun
+12 Jun
+18 Jun
+18 Jun
+$77k
+$84k
+$91k
+$98k
+$
+
+=== RUN: BNB 5m last 30d (BNBUSDT 5m, 2026-05-19 to 2026-06-18) ===
+FINAL CAPITAL
+$77,462
+-$22,538 (-22.5%)
+WIN RATE
+8.8%
+3W / 17L / 5BE
+PROFIT FACTOR
+0.07
+Gross win / gross loss
+MAX DRAWDOWN
+-22.5%
+-$22,538
+SHARPE RATIO
+-14.39
+>1.0 = good
+Equity Curve — $100,000 → $77,462
+📄 Export Full Report
+20 May
+21 May
+22 May
+23 May
+28 May
+29 May
+4 Jun
+11 Jun
+11 Jun
+12 Jun
+18 Jun
+18 Jun
+$77k
+$84k
+$91k
+$98k
+$105k
+0%
+6%
+12%
+18%
+
+=== RUN: BTC 1h last 120d (BTCUSDT 1h, 2026-02-18 to 2026-06-18) ===
+FINAL CAPITAL
+$75,943
+-$24,057 (-24.1%)
+WIN RATE
+6.8%
+5W / 40L / 16BE
+PROFIT FACTOR
+0.06
+Gross win / gross loss
+MAX DRAWDOWN
+-28.9%
+-$30,824
+SHARPE RATIO
+-12.83
+>1.0 = good
+Equity Curve — $100,000 → $75,943
+📄 Export Full Report
+28 Feb
+11 Mar
+21 Mar
+30 Mar
+6 Apr
+7 Apr
+16 Apr
+20 Apr
+26 Apr
+4 May
+10 May
+15 May
+30 May
+9 Jun
+13 Jun
+18 Jun
+$72k
+$81k
+$90
+
+=== RUN: ETH 1h last 120d (ETHUSDT 1h, 2026-02-18 to 2026-06-18) ===
+FINAL CAPITAL
+$94,068
+-$5,932 (-5.9%)
+WIN RATE
+19.0%
+11W / 25L / 13BE
+PROFIT FACTOR
+0.25
+Gross win / gross loss
+MAX DRAWDOWN
+-12.3%
+-$12,264
+SHARPE RATIO
+-7.51
+>1.0 = good
+Equity Curve — $100,000 → $94,068
+📄 Export Full Report
+25 Feb
+9 Mar
+22 Mar
+30 Mar
+6 Apr
+9 Apr
+14 Apr
+23 Apr
+30 Apr
+12 May
+19 May
+26 May
+9 Jun
+12 Jun
+17 Jun
+18 Jun
+$88k
+$91k
+$95k
+
+=== RUN: BTC 5m 60-90d ago (BTCUSDT 5m, 2026-03-20 to 2026-04-19) ===
+FINAL CAPITAL
+$82,670
+-$17,330 (-17.3%)
+WIN RATE
+5.6%
+2W / 21L / 5BE
+PROFIT FACTOR
+0.06
+Gross win / gross loss
+MAX DRAWDOWN
+-17.6%
+-$17,625
+SHARPE RATIO
+-15.86
+>1.0 = good
+Equity Curve — $100,000 → $82,670
+📄 Export Full Report
+20 Mar
+21 Mar
+26 Mar
+26 Mar
+27 Mar
+27 Mar
+28 Mar
+28 Mar
+3 Apr
+3 Apr
+9 Apr
+10 Apr
+10 Apr
+16 Apr
+17 Apr
+$80k
+$85k
+$90k
+$95k
+
+
+=== RUN: ETH 5m 60-90d ago (ETHUSDT 5m, 2026-03-20 to 2026-04-19) ===
+FINAL CAPITAL
+$76,675
+-$23,325 (-23.3%)
+WIN RATE
+13.9%
+5W / 23L / 3BE
+PROFIT FACTOR
+0.13
+Gross win / gross loss
+MAX DRAWDOWN
+-23.3%
+-$23,325
+SHARPE RATIO
+-13.20
+>1.0 = good
+Equity Curve — $100,000 → $76,675
+📄 Export Full Report
+20 Mar
+22 Mar
+26 Mar
+27 Mar
+2 Apr
+3 Apr
+3 Apr
+5 Apr
+9 Apr
+10 Apr
+10 Apr
+16 Apr
+17 Apr
+17 Apr
+17 Apr
+$75k
+$83k
+$90k
+$98k
+$
+
+
+=== ALL RUNS SUMMARY ===
+[
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "BTC 5m last 30d",
+    "finalCapital": "75,137",
+    "returnPct": "-24.9",
+    "winRate": "7.1",
+    "profitFactor": "0.09",
+    "wins": "3",
+    "losses": "21",
+    "breakevens": "4"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "ETH 5m last 30d",
+    "finalCapital": "76,739",
+    "returnPct": "-23.3",
+    "winRate": "10.0",
+    "profitFactor": "0.10",
+    "wins": "4",
+    "losses": "23",
+    "breakevens": "7"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "SOL 5m last 30d",
+    "finalCapital": "77,780",
+    "returnPct": "-22.2",
+    "winRate": "9.3",
+    "profitFactor": "0.11",
+    "wins": "4",
+    "losses": "25",
+    "breakevens": "6"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "interval": "5m",
+    "start": "2026-05-19T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "BNB 5m last 30d",
+    "finalCapital": "77,462",
+    "returnPct": "-22.5",
+    "winRate": "8.8",
+    "profitFactor": "0.07",
+    "wins": "3",
+    "losses": "17",
+    "breakevens": "5"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "BTC 1h last 120d",
+    "finalCapital": "75,943",
+    "returnPct": "-24.1",
+    "winRate": "6.8",
+    "profitFactor": "0.06",
+    "wins": "5",
+    "losses": "40",
+    "breakevens": "16"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "start": "2026-02-18T16:14:56.963Z",
+    "end": "2026-06-18T16:14:56.963Z",
+    "label": "ETH 1h last 120d",
+    "finalCapital": "94,068",
+    "returnPct": "-5.9",
+    "winRate": "19.0",
+    "profitFactor": "0.25",
+    "wins": "11",
+    "losses": "25",
+    "breakevens": "13"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T16:14:56.963Z",
+    "end": "2026-04-19T16:14:56.963Z",
+    "label": "BTC 5m 60-90d ago",
+    "finalCapital": "82,670",
+    "returnPct": "-17.3",
+    "winRate": "5.6",
+    "profitFactor": "0.06",
+    "wins": "2",
+    "losses": "21",
+    "breakevens": "5"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "5m",
+    "start": "2026-03-20T16:14:56.963Z",
+    "end": "2026-04-19T16:14:56.963Z",
+    "label": "ETH 5m 60-90d ago",
+    "finalCapital": "76,675",
+    "returnPct": "-23.3",
+    "winRate": "13.9",
+    "profitFactor": "0.13",
+    "wins": "5",
+    "losses": "23",
+    "breakevens": "3"
+  }
+]
+
+=== FINAL DATASET STATE ===
+📊 ML Training Dataset
+
+Every backtest trade, feature-engineered for model training. Built from 8 stored simulations.
+
+← Back to Simulator
+TRAINING EXAMPLES
+364
+WIN RATE
+10.2%
+AVG R-MULTIPLE
+-0.547
+READY FOR ML
+✓ Yes
+Dataset Quality Score
+Sample Size
+██████░░
+364 / 500 target
+Class Balance
+██░░░░░░
+10.2% wins
+Pattern Variety
+████████
+12 patterns
+Regime Coverage
+███████░
+5 regimes
+✓ Ready for Random Forest / XGBoost training
+⚠ 364 trades — usable for basic patterns. Run more simulations to improve accuracy.
+⚠ Class imbalance: only 10% wins. Use class_weight='balanced' in sklearn.
+Feature Columns Preview (first 5 rows)
+PATTERN	RSI	HTF BIAS	VOL RATIO	REGIME	R-MULTIPLE	OUTCOME
+Head & Shoulders	4
+
+=== FINAL INTELLIGENCE REPORT ===
+🧠 Intelligence Report
+
+Edge registry derived from every live signal and simulated trade — pattern × symbol × timeframe × regime × session.
+
+← Back to Simulator
+Last generated 18/06/2026, 21:46:06
+⬇ Export Full Backup
+↻ Generate Report Now
+OVERALL HEALTH SCORE
+50/100
+Share of active (20+ sample) edges with a profit factor above 1.0.
+Insights
+Not enough data yet — run more simulations (need 20+ trades per pattern/regime/session combo for the first insights).
+🏆 Top Edges
+
+No edges with 20+ samples yet.
+
+📉 Worst Edges
+
+No underperforming edges (PF < 1.0) yet.
+
+All Edge Combinations (214)
+PATTERN	SYMBOL	TF	REGIME	SESSION	TRADES	WIN RATE	PF	STATUS	SOURCE
+Double Bottom	BTCUSDT	5m	ranging	asia	8	13%	0.19	learning	sim
+Ascending Triangle	ETHUSDT	5m	weak_uptrend	asia	7	0%	0.00	learning	sim
+Double Top	BTCUSDT	5m	ranging	asia	6	17%	0.14	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	asia	6	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	1h	weak_uptrend	asia	6	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	asia	5	0%	0.00	learning	sim
+Double Bottom	SOLUSDT	5m	ranging	asia	5	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	asia	5	20%	0.04	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	london	4	0%	0.00	learning	sim
+Double Top	ETHUSDT	5m	ranging	asia	4	25%	9.99	learning	sim
+Head & Shoulders	ETHUSDT	5m	ranging	london	4	0%	0.00	learning	sim
+Bearish Engulfing	ETHUSDT	5m	ranging	asia	4	25%	1.04	learning	sim
+Ascending Triangle	BNBUSDT	5m	weak_uptrend	asia	4	25%	0.10	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_downtrend	new_york	4	25%	0.14	learning	sim
+Bearish Engulfing	BTCUSDT	1h	weak_downtrend	asia	4	0%	0.00	learning	sim
+Bull Flag	ETHUSDT	1h	weak_uptrend	asia	4	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	5m	ranging	asia	4	0%	0.00	learning	sim
+Double Bottom	BTCUSDT	5m	ranging	overlap	3	33%	0.07	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	new_york	3	0%	0.00	learning	sim
+Bearish Engulfing	BTCUSDT	5m	weak_downtrend	overlap	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	ranging	asia	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	5m	weak_uptrend	london	3	0%	0.00	learning	sim
+Double Bottom	ETHUSDT	5m	ranging	overlap	3	0%	0.00	learning	sim
+Ascending Triangle	ETHUSDT	5m	weak_uptrend	london	3	0%	0.00	learning	sim
+Double Top	ETHUSDT	5m	ranging	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	5m	weak_uptrend	london	3	67%	1.78	learning	sim
+Double Top	SOLUSDT	5m	ranging	london	3	0%	0.00	learning	sim
+Double Top	SOLUSDT	5m	ranging	asia	3	33%	0.32	learning	sim
+Ascending Triangle	SOLUSDT	5m	weak_uptrend	asia	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	weak_uptrend	asia	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	london	3	0%	0.00	learning	sim
+Head & Shoulders	BTCUSDT	1h	ranging	asia	3	0%	0.00	learning	sim
+Ascending Triangle	BTCUSDT	1h	weak_uptrend	new_york	3	0%	0.00	learning	sim
+Head & Shoulders	ETHUSDT	1h	weak_uptrend	london	3	67%	9.99	lea
+
+DONE

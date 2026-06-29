@@ -2,26 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #0a0a0a;
+  color: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+.price {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-feature-settings: 'tnum' 1;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes flashGreen {
+  0% { color: inherit; }
+  25% { color: #22c55e; text-shadow: 0 0 8px rgba(34,197,94,0.4); }
+  100% { color: inherit; }
 }
+@keyframes flashRed {
+  0% { color: inherit; }
+  25% { color: #ef4444; text-shadow: 0 0 8px rgba(239,68,68,0.4); }
+  100% { color: inherit; }
+}
+.flash-green { animation: flashGreen 600ms ease-out; }
+.flash-red { animation: flashRed 600ms ease-out; }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+@keyframes borderPulse {
+  0% { border-left-color: transparent; }
+  50% { box-shadow: -3px 0 12px rgba(34,197,94,0.3); }
+  100% {}
+}
+.signal-pulse { animation: borderPulse 800ms ease-out; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.live-dot { animation: pulse 2s infinite; }
+
+.confidence-bar {
+  transition: width 600ms ease-out;
 }

@@ -3,7 +3,11 @@ import type { PatternResult } from './pattern-engine';
 import type { Candle } from './binance-ws';
 import { getPatternContextForGPT } from './pattern-knowledge';
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let _client: OpenAI | null = null;
+function getClient(): OpenAI {
+  if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _client;
+}
 
 export type AnalysisResult = {
   verdict: 'strong_buy' | 'buy' | 'neutral' | 'sell' | 'strong_sell';
@@ -128,7 +132,7 @@ Respond ONLY with this JSON:
 }`;
 
   try {
-    const response = await client.chat.completions.create({
+    const response = await getClient().chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
@@ -167,7 +171,7 @@ Identify and respond ONLY with this JSON:
   "recommendation": "buy|sell|wait"
 }`;
 
-  const response = await client.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: 'gpt-4o',
     messages: [
       {
@@ -206,7 +210,7 @@ export async function generateQuickSuggestion(params: {
   timeframe: string;
 }): Promise<QuickSuggestion> {
   try {
-    const response = await client.chat.completions.create({
+    const response = await getClient().chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -251,7 +255,7 @@ export async function streamAnalysis(params: {
 
   const userPrompt = `Analyze ${params.symbol.toUpperCase()} on ${params.timeframe}: ${params.pattern.name} pattern (${params.pattern.confidence}% confidence). Price: ${params.currentPrice.toFixed(4)}, RSI: ${params.rsi.toFixed(1)}, Support: ${params.support.toFixed(4)}, Resistance: ${params.resistance.toFixed(4)}, Target: ${params.target.toFixed(4)}, Stop: ${params.stopLoss.toFixed(4)}. Last 10 candles: ${JSON.stringify(last10)}. Provide detailed analysis as JSON with: verdict, confidence, analysis, entryStrategy, riskManagement, keyLevels array, timeToTarget.`;
 
-  const stream = await client.chat.completions.create({
+  const stream = await getClient().chat.completions.create({
     model: 'gpt-4o',
     stream: true,
     messages: [

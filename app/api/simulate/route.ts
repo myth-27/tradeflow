@@ -1,11 +1,9 @@
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+export const maxDuration = 60;
 
 import { NextRequest } from 'next/server';
 import { fetchSimulationData, runSimulation, type SimConfig } from '@/lib/simulator';
-
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 const VALID_INTERVALS = new Set(['1m', '5m', '15m', '1h', '4h', '1d']);
 

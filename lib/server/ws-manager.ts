@@ -5,11 +5,21 @@ import { processNewCandle, STREAMS } from './signal-processor';
 const sockets = new Map<string, WebSocket>();
 const reconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
+// Bybit has no geo-restrictions — accessible from any Railway region
+const BYBIT_WS = 'wss://stream.bybit.com/v5/public/linear';
+
+// Distinct timeframes across all streams
+const TIMEFRAMES = Array.from(new Set(STREAMS.map(s => s.tf)));
+const SYMBOLS = Array.from(new Set(STREAMS.map(s => s.symbol)));
+
+// Bybit interval codes
+const TF_MAP: Record<string, string> = { '15m': '15', '1h': '60' };
+
 export function startWsManager(): void {
-  for (const { symbol, tf } of STREAMS) {
-    connectStream(symbol, tf);
+  for (const tf of TIMEFRAMES) {
+    connectBybit(tf);
   }
-  console.log(`[ws] WebSocket manager started — ${STREAMS.length} streams`);
+  console.log(`[ws] WebSocket manager started (Bybit) — ${SYMBOLS.length} symbols × ${TIMEFRAMES.length} timeframes`);
 }
 
 export function stopWsManager(): void {
@@ -19,41 +29,54 @@ export function stopWsManager(): void {
   reconnectTimers.clear();
 }
 
-function connectStream(symbol: string, tf: string): void {
-  const streamKey = `${symbol}:${tf}`;
-  const url = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${tf}`;
+function connectBybit(tf: string): void {
+  const interval = TF_MAP[tf];
+  if (!interval) return;
 
-  const ws = new WebSocket(url);
-  sockets.set(streamKey, ws);
+  const topics = SYMBOLS.map(sym => `kline.${interval}.${sym}`);
+  const ws = new WebSocket(BYBIT_WS);
+  sockets.set(tf, ws);
 
   ws.on('open', async () => {
-    console.log(`[ws] connected ${streamKey}`);
-    await seedHistoricalCandles(symbol, tf);
+    ws.send(JSON.stringify({ op: 'subscribe', args: topics }));
+    console.log(`[ws] subscribed ${topics.length} Bybit kline.${interval} streams`);
+    for (const sym of SYMBOLS) {
+      await seedHistoricalCandles(sym, tf, interval);
+    }
   });
 
   ws.on('message', (raw: Buffer) => {
     try {
       const msg = JSON.parse(raw.toString()) as {
-        k: {
-          t: number; o: string; h: string; l: string;
-          c: string; v: string; x: boolean;
-        };
+        topic?: string;
+        data?: Array<{
+          start: number; open: string; high: string; low: string;
+          close: string; volume: string; confirm: boolean;
+        }>;
       };
-      const k = msg.k;
+
+      if (!msg.topic || !msg.data?.length) return;
+
+      // topic format: "kline.15.BTCUSDT"
+      const parts = msg.topic.split('.');
+      if (parts.length < 3) return;
+      const symbol = parts[2];
+
+      const k = msg.data[0];
       const candle = {
-        time: k.t / 1000,
-        open: parseFloat(k.o),
-        high: parseFloat(k.h),
-        low: parseFloat(k.l),
-        close: parseFloat(k.c),
-        volume: parseFloat(k.v),
+        time: k.start / 1000,
+        open: parseFloat(k.open),
+        high: parseFloat(k.high),
+        low: parseFloat(k.low),
+        close: parseFloat(k.close),
+        volume: parseFloat(k.volume),
       };
 
-      pushCandle(symbol, tf, candle, k.x);
+      pushCandle(symbol, tf, candle, k.confirm);
 
-      if (k.x) {
+      if (k.confirm) {
         processNewCandle(symbol, tf).catch((err: unknown) =>
-          console.error(`[signal] error processing ${streamKey}:`, err),
+          console.error(`[signal] error ${symbol}:${tf}:`, err),
         );
       }
     } catch {
@@ -62,30 +85,32 @@ function connectStream(symbol: string, tf: string): void {
   });
 
   ws.on('close', () => {
-    console.log(`[ws] disconnected ${streamKey} — reconnecting in 5s`);
-    sockets.delete(streamKey);
-    const t = setTimeout(() => connectStream(symbol, tf), 5000);
-    reconnectTimers.set(streamKey, t);
+    console.log(`[ws] disconnected tf=${tf} — reconnecting in 5s`);
+    sockets.delete(tf);
+    const t = setTimeout(() => connectBybit(tf), 5000);
+    reconnectTimers.set(tf, t);
   });
 
   ws.on('error', (err: Error) => {
-    console.error(`[ws] error ${streamKey}:`, err.message);
+    console.error(`[ws] error tf=${tf}:`, err.message);
     ws.terminate();
   });
 }
 
-async function seedHistoricalCandles(symbol: string, tf: string): Promise<void> {
+async function seedHistoricalCandles(symbol: string, tf: string, interval: string): Promise<void> {
   try {
-    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=300`;
+    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=300`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.warn(`[ws] seed fetch failed ${symbol} ${tf}: ${res.status}`);
+      console.warn(`[ws] Bybit seed failed ${symbol} ${tf}: ${res.status}`);
       return;
     }
-    const klines = await res.json() as Array<[number, string, string, string, string, string]>;
-    for (const k of klines) {
+    const data = await res.json() as { result: { list: string[][] } };
+    const klines = data.result?.list ?? [];
+    // Bybit returns newest-first — reverse to get chronological order
+    for (const k of [...klines].reverse()) {
       pushCandle(symbol, tf, {
-        time: k[0] / 1000,
+        time: parseInt(k[0]) / 1000,
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
         low: parseFloat(k[3]),
@@ -93,7 +118,7 @@ async function seedHistoricalCandles(symbol: string, tf: string): Promise<void> 
         volume: parseFloat(k[5]),
       }, true);
     }
-    console.log(`[ws] seeded ${klines.length} candles for ${symbol} ${tf}`);
+    console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf}`);
   } catch (err) {
     console.error(`[ws] seed error ${symbol} ${tf}:`, err);
   }

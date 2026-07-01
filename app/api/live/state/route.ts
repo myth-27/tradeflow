@@ -52,18 +52,23 @@ export async function GET() {
       });
 
     // In-memory prices are populated by Railway engine.
-    // On Vercel (dashboard-only), fall back to Binance REST API.
+    // On Vercel (dashboard-only), fall back to CoinGecko (no geo-restrictions).
     let livePrices = getLivePrices();
     if (Object.keys(livePrices).length === 0) {
       try {
-        const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
-        const priceRes = await fetch(
-          `https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(symbols)}`,
+        const cgRes = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple&vs_currencies=usd',
           { next: { revalidate: 0 } },
         );
-        if (priceRes.ok) {
-          const data: Array<{ symbol: string; price: string }> = await priceRes.json();
-          livePrices = Object.fromEntries(data.map(d => [d.symbol, parseFloat(d.price)]));
+        if (cgRes.ok) {
+          const cg = await cgRes.json() as Record<string, { usd: number }>;
+          livePrices = {
+            BTCUSDT: cg.bitcoin?.usd ?? 0,
+            ETHUSDT: cg.ethereum?.usd ?? 0,
+            SOLUSDT: cg.solana?.usd ?? 0,
+            BNBUSDT: cg.binancecoin?.usd ?? 0,
+            XRPUSDT: cg.ripple?.usd ?? 0,
+          };
         }
       } catch { /* non-critical */ }
     }

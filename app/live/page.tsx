@@ -172,6 +172,17 @@ export default function LivePage() {
     return () => clearInterval(id);
   }, [fetchState]);
 
+  // Override global overflow:hidden so the live page can scroll
+  useEffect(() => {
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    return () => {
+      document.documentElement.style.overflow = prev;
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // Candle data: fetch selected symbol on mount and when symbol/tf changes; refresh every 60s
   useEffect(() => {
     const load = async () => {

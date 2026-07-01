@@ -102,6 +102,11 @@ export async function initDb(): Promise<void> {
       ('last_reset', '0')
     ON CONFLICT (key) DO NOTHING;
 
+    -- Always keep capital in sync with STARTING_CAPITAL env var
+    UPDATE system_state
+    SET value = '${process.env.STARTING_CAPITAL ?? "10000"}'
+    WHERE key = 'capital';
+
     -- Add columns that might be missing from earlier schema versions
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS tp1_hit BOOLEAN NOT NULL DEFAULT false;
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS pnl_abs DOUBLE PRECISION;

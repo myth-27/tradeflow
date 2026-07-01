@@ -51,6 +51,23 @@ export async function GET() {
         return { t: t.closed_at, v: parseFloat(running.toFixed(2)) };
       });
 
+    // In-memory prices are populated by Railway engine.
+    // On Vercel (dashboard-only), fall back to Binance REST API.
+    let livePrices = getLivePrices();
+    if (Object.keys(livePrices).length === 0) {
+      try {
+        const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+        const priceRes = await fetch(
+          `https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(symbols)}`,
+          { next: { revalidate: 0 } },
+        );
+        if (priceRes.ok) {
+          const data: Array<{ symbol: string; price: string }> = await priceRes.json();
+          livePrices = Object.fromEntries(data.map(d => [d.symbol, parseFloat(d.price)]));
+        }
+      } catch { /* non-critical */ }
+    }
+
     return NextResponse.json({
       halted: state['halted'] === 'true',
       engineEnabled: process.env.ENABLE_ENGINE === 'true',
@@ -67,7 +84,7 @@ export async function GET() {
       recentSignals: signalsRes.rows,
       symbolStats,
       equityCurve,
-      livePrices: getLivePrices(),
+      livePrices,
     });
   } catch (err) {
     console.error('[live/state] error:', err);

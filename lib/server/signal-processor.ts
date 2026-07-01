@@ -15,8 +15,8 @@ const STREAMS: Array<{ symbol: string; tf: string }> = [
 const MIN_CANDLES = 100;
 const MIN_EDGE = 60;
 const MIN_RR = 1.5;
-const CAPITAL = 10_000;
-const RISK_PER_TRADE = 0.01; // 1%
+const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
+const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
 const MAX_DAILY_LOSS_PCT = 0.03;
 
 // Cooldown: don't fire the same symbol+tf twice within 30 min

@@ -60,7 +60,7 @@ export async function initDb(): Promise<void> {
     INSERT INTO system_state (key, value)
     VALUES
       ('halted', 'false'),
-      ('capital', '10000'),
+      ('capital', '${process.env.STARTING_CAPITAL ?? "10000"}'),
       ('total_trades', '0'),
       ('wins', '0'),
       ('losses', '0'),

@@ -4,6 +4,12 @@ export async function register(): Promise<void> {
     console.warn('[instrumentation] DATABASE_URL not set — paper trading engine disabled');
     return;
   }
+  // Vercel is serverless — engine cannot run persistently there.
+  // Set ENABLE_ENGINE=true only on Railway (or any always-on server).
+  if (process.env.ENABLE_ENGINE !== 'true') {
+    console.log('[instrumentation] Engine standby (ENABLE_ENGINE not set) — dashboard-only mode');
+    return;
+  }
 
   const { initDb } = await import('@/lib/server/db');
   const { startWsManager } = await import('@/lib/server/ws-manager');

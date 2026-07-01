@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Trade {
   id: string;
@@ -11,14 +13,17 @@ interface Trade {
   stop_loss: number;
   tp1: number;
   tp2: number;
+  tp1_hit: boolean;
   pattern: string;
   edge_score: number;
   tier: string;
+  size: number;
   opened_at: number;
   closed_at?: number;
   exit_price?: number;
   exit_reason?: string;
   pnl_pct?: number;
+  pnl_abs?: number;
   status: string;
 }
 
@@ -38,9 +43,21 @@ interface Signal {
   detected_at: number;
 }
 
+interface SymbolStat {
+  wins: number;
+  losses: number;
+  totalPnl: number;
+  trades: number;
+}
+
+interface EquityPoint { t: number; v: number }
+
 interface LiveState {
   halted: boolean;
+  engineEnabled: boolean;
   capital: number;
+  totalPnlAbs: number;
+  totalPnlPct: number;
   dailyPnl: number;
   totalTrades: number;
   wins: number;
@@ -49,42 +66,91 @@ interface LiveState {
   openTrades: Trade[];
   closedTrades: Trade[];
   recentSignals: Signal[];
+  symbolStats: Record<string, SymbolStat>;
+  equityCurve: EquityPoint[];
   livePrices: Record<string, number>;
 }
 
-const POLL_INTERVAL = 10_000;
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function fmt(n: number, decimals = 2): string {
-  return n.toLocaleString('en-US', { maximumFractionDigits: decimals, minimumFractionDigits: decimals });
+function fmt(n: number, d = 2) {
+  return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
 }
+function fmtPrice(n: number) { return n > 100 ? fmt(n, 2) : fmt(n, 4); }
+function pnlClass(v: number) { return v > 0 ? 'text-green-400' : v < 0 ? 'text-red-400' : 'text-gray-400'; }
+function sign(v: number) { return v > 0 ? '+' : ''; }
 
-function pnlColor(v: number): string {
-  if (v > 0) return 'text-green-400';
-  if (v < 0) return 'text-red-400';
-  return 'text-gray-400';
-}
-
-function tierBadge(tier: string): string {
+function tierBadge(tier: string) {
   const map: Record<string, string> = {
     'A+': 'bg-yellow-500 text-black',
-    'A': 'bg-green-600 text-white',
-    'B': 'bg-blue-600 text-white',
-    'C': 'bg-gray-600 text-white',
+    'A': 'bg-green-700 text-white',
+    'B': 'bg-blue-700 text-white',
+    'C': 'bg-gray-700 text-white',
   };
-  return map[tier] ?? 'bg-gray-700 text-white';
+  return `px-1 py-0.5 rounded text-[10px] font-bold ${map[tier] ?? 'bg-gray-800 text-white'}`;
 }
+
+// ─── Equity Curve SVG ─────────────────────────────────────────────────────────
+
+function EquityCurve({ points }: { points: EquityPoint[] }) {
+  const W = 600; const H = 100; const PAD = 4;
+  if (points.length < 2) {
+    return (
+      <div className="h-[100px] flex items-center justify-center text-gray-700 text-xs">
+        Waiting for closed trades…
+      </div>
+    );
+  }
+  const values = points.map(p => p.v);
+  const min = Math.min(...values, 0);
+  const max = Math.max(...values, 0);
+  const range = max - min || 1;
+  const pts = points.map((p, i) => {
+    const x = PAD + ((i / (points.length - 1)) * (W - PAD * 2));
+    const y = H - PAD - ((p.v - min) / range) * (H - PAD * 2);
+    return `${x},${y}`;
+  });
+  const last = points[points.length - 1].v;
+  const color = last >= 0 ? '#22c55e' : '#ef4444';
+  const zeroY = H - PAD - ((0 - min) / range) * (H - PAD * 2);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[100px]" preserveAspectRatio="none">
+      {/* Zero line */}
+      <line x1={PAD} y1={zeroY} x2={W - PAD} y2={zeroY} stroke="#374151" strokeWidth="1" strokeDasharray="4 2" />
+      {/* Fill under curve */}
+      <polyline
+        points={[`${PAD},${H - PAD}`, ...pts, `${W - PAD},${H - PAD}`].join(' ')}
+        fill={color} fillOpacity="0.08" stroke="none"
+      />
+      {/* Curve */}
+      <polyline points={pts.join(' ')} fill="none" stroke={color} strokeWidth="1.5" />
+      {/* Last point dot */}
+      {pts.length > 0 && (
+        <circle
+          cx={parseFloat(pts[pts.length - 1].split(',')[0])}
+          cy={parseFloat(pts[pts.length - 1].split(',')[1])}
+          r="3" fill={color}
+        />
+      )}
+    </svg>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function LivePage() {
   const [state, setState] = useState<LiveState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toggling, setToggling] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [tab, setTab] = useState<'open' | 'signals' | 'closed'>('open');
 
   const fetchState = useCallback(async () => {
     try {
       const res = await fetch('/api/live/state');
       if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Unknown error' }));
+        const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
         setError(body.error ?? `HTTP ${res.status}`);
         return;
       }
@@ -98,7 +164,7 @@ export default function LivePage() {
 
   useEffect(() => {
     fetchState();
-    const id = setInterval(fetchState, POLL_INTERVAL);
+    const id = setInterval(fetchState, 5_000);
     return () => clearInterval(id);
   }, [fetchState]);
 
@@ -106,21 +172,38 @@ export default function LivePage() {
     setToggling(true);
     try {
       const res = await fetch('/api/live/halt-proxy', { method: 'POST' });
-      if (res.ok) {
-        await fetchState();
-      }
+      if (res.ok) await fetchState();
     } finally {
       setToggling(false);
     }
   };
 
+  // Live unrealized P&L for open trades
+  const openWithLivePnl = useMemo(() => {
+    if (!state) return [];
+    return state.openTrades.map(t => {
+      const live = state.livePrices[t.symbol] ?? t.entry;
+      const pnl = t.direction === 'long'
+        ? ((live - t.entry) / t.entry) * 100
+        : ((t.entry - live) / t.entry) * 100;
+      const pnlAbs = (pnl / 100) * t.entry * t.size;
+      return { ...t, livePnl: pnl, livePnlAbs: pnlAbs };
+    });
+  }, [state]);
+
+  const unrealizedAbs = useMemo(
+    () => openWithLivePnl.reduce((s, t) => s + t.livePnlAbs, 0),
+    [openWithLivePnl],
+  );
+
+  // ── Error state ────────────────────────────────────────────────────────────
   if (error && !state) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-red-400 text-center">
-          <div className="text-2xl mb-2">Engine Unavailable</div>
-          <div className="text-sm text-gray-500">{error}</div>
-          <div className="text-sm text-gray-600 mt-1">DATABASE_URL may not be configured.</div>
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center text-center">
+        <div>
+          <div className="text-red-400 text-xl mb-2">Engine Unavailable</div>
+          <div className="text-gray-500 text-sm">{error}</div>
+          <div className="text-gray-600 text-xs mt-1">DATABASE_URL may not be configured on this deployment.</div>
         </div>
       </div>
     );
@@ -129,200 +212,331 @@ export default function LivePage() {
   if (!state) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse">Loading live engine…</div>
+        <div className="text-gray-500 animate-pulse">Connecting to live engine…</div>
       </div>
     );
   }
 
-  const { halted, dailyPnl, totalTrades, wins, losses, winRate,
-    openTrades, closedTrades, recentSignals, livePrices } = state;
+  const { halted, engineEnabled, capital, totalPnlAbs, totalPnlPct, dailyPnl,
+    totalTrades, wins, losses, winRate, recentSignals, closedTrades,
+    symbolStats, equityCurve, livePrices } = state;
+
+  const totalWithUnrealized = totalPnlAbs + unrealizedAbs;
+  const symbols = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP'];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-4 font-mono text-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-gray-950 text-gray-100 font-mono text-sm">
+      {/* ── Header ── */}
+      <div className="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">TradeFlow Live Engine</h1>
-          {lastUpdated && (
-            <div className="text-xs text-gray-500">
-              Updated {lastUpdated.toLocaleTimeString()} · auto-refresh 10s
-            </div>
+          <span className="text-white font-bold text-base">TradeFlow</span>
+          <span className="text-gray-600 ml-2 text-xs">Live Paper Engine</span>
+          {!engineEnabled && (
+            <span className="ml-3 px-2 py-0.5 bg-yellow-900/60 text-yellow-400 rounded text-[10px] border border-yellow-700">
+              DASHBOARD ONLY — engine on Railway
+            </span>
+          )}
+          {halted && (
+            <span className="ml-3 px-2 py-0.5 bg-red-900/60 text-red-400 rounded text-[10px] border border-red-700">
+              HALTED
+            </span>
           )}
         </div>
-        <button
-          onClick={toggleHalt}
-          disabled={toggling}
-          className={`px-4 py-2 rounded font-bold text-sm transition-colors ${
-            halted
-              ? 'bg-green-700 hover:bg-green-600 text-white'
-              : 'bg-red-700 hover:bg-red-600 text-white'
-          }`}
-        >
-          {toggling ? '…' : halted ? 'RESUME ENGINE' : 'HALT ENGINE'}
-        </button>
+        <div className="flex items-center gap-3">
+          {lastUpdated && (
+            <span className="text-gray-600 text-[10px]">
+              {lastUpdated.toLocaleTimeString()} · 5s refresh
+            </span>
+          )}
+          {error && <span className="text-yellow-500 text-xs">{error}</span>}
+          <button
+            onClick={toggleHalt}
+            disabled={toggling}
+            className={`px-3 py-1.5 rounded text-xs font-bold transition-colors ${
+              halted ? 'bg-green-700 hover:bg-green-600' : 'bg-red-800 hover:bg-red-700'
+            }`}
+          >
+            {toggling ? '…' : halted ? 'RESUME' : 'HALT'}
+          </button>
+        </div>
       </div>
 
-      {halted && (
-        <div className="mb-4 p-3 rounded bg-red-900/40 border border-red-700 text-red-300 text-xs">
-          ENGINE HALTED — no new trades will be opened
-        </div>
-      )}
-      {error && (
-        <div className="mb-4 p-2 rounded bg-yellow-900/30 border border-yellow-700 text-yellow-300 text-xs">
-          {error}
-        </div>
-      )}
-
-      {/* Live Prices */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        {Object.entries(livePrices).map(([sym, price]) => (
-          <div key={sym} className="bg-gray-900 rounded px-3 py-2">
-            <span className="text-gray-400 mr-2">{sym}</span>
-            <span className="text-white font-bold">${fmt(price, price > 100 ? 2 : 4)}</span>
-          </div>
-        ))}
+      {/* ── Price strip ── */}
+      <div className="border-b border-gray-800/60 bg-gray-900/30 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1">
+        {symbols.map(sym => {
+          const price = livePrices[`${sym}USDT`];
+          return (
+            <span key={sym} className="text-xs">
+              <span className="text-gray-500">{sym} </span>
+              <span className="text-white font-bold">
+                {price ? `$${fmtPrice(price)}` : '—'}
+              </span>
+            </span>
+          );
+        })}
         {Object.keys(livePrices).length === 0 && (
-          <div className="text-gray-600 text-xs">Waiting for price feed…</div>
+          <span className="text-gray-700 text-xs">Waiting for price feed…</span>
         )}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <StatCard label="Daily P&L" value={`${dailyPnl >= 0 ? '+' : ''}$${fmt(dailyPnl)}`}
-          color={dailyPnl >= 0 ? 'text-green-400' : 'text-red-400'} />
-        <StatCard label="Total Trades" value={String(totalTrades)} />
-        <StatCard label="Win Rate" value={`${winRate}%`}
-          sub={`${wins}W / ${losses}L`}
-          color={winRate >= 50 ? 'text-green-400' : 'text-red-400'} />
-        <StatCard label="Open Positions" value={String(openTrades.length)}
-          color={openTrades.length > 0 ? 'text-yellow-400' : 'text-gray-400'} />
-      </div>
+      <div className="p-4 space-y-4">
+        {/* ── Stats row ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <StatCard
+            label="Total P&L"
+            value={`${sign(totalWithUnrealized)}$${fmt(Math.abs(totalWithUnrealized))}`}
+            sub={`${sign(totalPnlPct)}${fmt(Math.abs(totalPnlPct))}% of capital`}
+            color={pnlClass(totalWithUnrealized)}
+          />
+          <StatCard
+            label="Realized P&L"
+            value={`${sign(totalPnlAbs)}$${fmt(Math.abs(totalPnlAbs))}`}
+            color={pnlClass(totalPnlAbs)}
+          />
+          <StatCard
+            label="Unrealized"
+            value={`${sign(unrealizedAbs)}$${fmt(Math.abs(unrealizedAbs))}`}
+            sub={`${openWithLivePnl.length} open`}
+            color={pnlClass(unrealizedAbs)}
+          />
+          <StatCard
+            label="Daily P&L"
+            value={`${sign(dailyPnl)}$${fmt(Math.abs(dailyPnl))}`}
+            color={pnlClass(dailyPnl)}
+          />
+          <StatCard
+            label="Win Rate"
+            value={`${winRate}%`}
+            sub={`${wins}W / ${losses}L / ${totalTrades} total`}
+            color={winRate >= 55 ? 'text-green-400' : winRate >= 45 ? 'text-yellow-400' : 'text-red-400'}
+          />
+          <StatCard
+            label="Capital"
+            value={`$${fmt(capital)}`}
+            sub="starting"
+          />
+        </div>
 
-      {/* Open Trades */}
-      <Section title={`Open Positions (${openTrades.length})`}>
-        {openTrades.length === 0 ? (
-          <div className="text-gray-600 p-3">No open positions</div>
-        ) : (
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-gray-500 border-b border-gray-800">
-                {['Symbol', 'TF', 'Dir', 'Entry', 'Stop', 'TP1', 'TP2', 'Pattern', 'Edge', 'Live P&L'].map(h => (
-                  <th key={h} className="text-left py-2 px-2">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {openTrades.map(t => {
-                const live = livePrices[t.symbol] ?? t.entry;
-                const livePnl = t.direction === 'long'
-                  ? ((live - t.entry) / t.entry) * 100
-                  : ((t.entry - live) / t.entry) * 100;
-                return (
-                  <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-900/30">
-                    <td className="py-2 px-2 text-white font-bold">{t.symbol}</td>
-                    <td className="py-2 px-2 text-gray-400">{t.timeframe}</td>
-                    <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
-                      {t.direction.toUpperCase()}
-                    </td>
-                    <td className="py-2 px-2">{fmt(t.entry, 4)}</td>
-                    <td className="py-2 px-2 text-red-400">{fmt(t.stop_loss, 4)}</td>
-                    <td className="py-2 px-2 text-blue-400">{fmt(t.tp1, 4)}</td>
-                    <td className="py-2 px-2 text-green-400">{fmt(t.tp2, 4)}</td>
-                    <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
-                    <td className="py-2 px-2">
-                      <span className={`px-1 py-0.5 rounded text-[10px] ${tierBadge(t.tier)}`}>{t.tier}</span>
-                      <span className="ml-1 text-gray-400">{t.edge_score.toFixed(0)}</span>
-                    </td>
-                    <td className={`py-2 px-2 font-bold ${pnlColor(livePnl)}`}>
-                      {livePnl >= 0 ? '+' : ''}{livePnl.toFixed(2)}%
-                    </td>
+        {/* ── Equity Curve ── */}
+        <div className="bg-gray-900 rounded overflow-hidden">
+          <div className="px-4 py-2 flex items-center justify-between border-b border-gray-800">
+            <span className="text-gray-400 text-xs uppercase tracking-wider">Equity Curve</span>
+            <span className={`text-sm font-bold ${pnlClass(totalPnlAbs)}`}>
+              {sign(totalPnlAbs)}${fmt(Math.abs(totalPnlAbs))} realized
+            </span>
+          </div>
+          <div className="px-2 py-1">
+            <EquityCurve points={equityCurve} />
+          </div>
+        </div>
+
+        {/* ── Per-symbol breakdown ── */}
+        {Object.keys(symbolStats).length > 0 && (
+          <div className="bg-gray-900 rounded overflow-hidden">
+            <div className="px-4 py-2 border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
+              By Symbol
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-gray-600 border-b border-gray-800">
+                    {['Symbol', 'Trades', 'W', 'L', 'Win Rate', 'Total P&L'].map(h => (
+                      <th key={h} className="text-left py-2 px-3">{h}</th>
+                    ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {Object.entries(symbolStats)
+                    .sort((a, b) => b[1].totalPnl - a[1].totalPnl)
+                    .map(([sym, s]) => {
+                      const wr = s.wins + s.losses > 0
+                        ? Math.round((s.wins / (s.wins + s.losses)) * 100)
+                        : 0;
+                      return (
+                        <tr key={sym} className="border-b border-gray-800/40 hover:bg-gray-800/30">
+                          <td className="py-2 px-3 text-white font-bold">{sym}</td>
+                          <td className="py-2 px-3 text-gray-400">{s.trades}</td>
+                          <td className="py-2 px-3 text-green-400">{s.wins}</td>
+                          <td className="py-2 px-3 text-red-400">{s.losses}</td>
+                          <td className={`py-2 px-3 font-bold ${wr >= 55 ? 'text-green-400' : wr >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
+                            {wr}%
+                          </td>
+                          <td className={`py-2 px-3 font-bold ${pnlClass(s.totalPnl)}`}>
+                            {sign(s.totalPnl)}${fmt(Math.abs(s.totalPnl))}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
-      </Section>
 
-      {/* Recent Signals */}
-      <Section title="Recent Signals (last 30)">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
-              {['Time', 'Symbol', 'TF', 'Pattern', 'Dir', 'Edge', 'Regime', 'Acted', 'Reason'].map(h => (
-                <th key={h} className="text-left py-2 px-2">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {recentSignals.map(s => (
-              <tr key={s.id} className="border-b border-gray-800/50 hover:bg-gray-900/30">
-                <td className="py-2 px-2 text-gray-500">{new Date(s.detected_at).toLocaleTimeString()}</td>
-                <td className="py-2 px-2 text-white">{s.symbol}</td>
-                <td className="py-2 px-2 text-gray-400">{s.timeframe}</td>
-                <td className="py-2 px-2 text-gray-300">{s.pattern}</td>
-                <td className={`py-2 px-2 font-bold ${s.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
-                  {s.direction.toUpperCase()}
-                </td>
-                <td className="py-2 px-2">
-                  <span className={`px-1 py-0.5 rounded text-[10px] ${tierBadge(s.tier)}`}>{s.tier}</span>
-                  <span className="ml-1 text-gray-400">{s.edge_score.toFixed(0)}</span>
-                </td>
-                <td className="py-2 px-2 text-gray-500">{s.regime}</td>
-                <td className="py-2 px-2">
-                  {s.acted
-                    ? <span className="text-green-400">✓ traded</span>
-                    : <span className="text-gray-600">skipped</span>}
-                </td>
-                <td className="py-2 px-2 text-gray-600">{s.reason ?? ''}</td>
-              </tr>
+        {/* ── Tab switcher ── */}
+        <div className="bg-gray-900 rounded overflow-hidden">
+          <div className="flex border-b border-gray-800">
+            {([
+              ['open', `Open (${openWithLivePnl.length})`],
+              ['signals', `Signals (${recentSignals.length})`],
+              ['closed', `Closed (${closedTrades.length})`],
+            ] as const).map(([t, label]) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-4 py-2 text-xs transition-colors ${
+                  tab === t
+                    ? 'text-white border-b-2 border-blue-500 -mb-px'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {label}
+              </button>
             ))}
-            {recentSignals.length === 0 && (
-              <tr><td colSpan={9} className="py-3 px-2 text-gray-600">No signals yet — waiting for market activity</td></tr>
-            )}
-          </tbody>
-        </table>
-      </Section>
+          </div>
 
-      {/* Closed Trades */}
-      <Section title="Closed Trades (last 20)">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
-              {['Time', 'Symbol', 'TF', 'Pattern', 'Dir', 'Entry', 'Exit', 'Reason', 'P&L'].map(h => (
-                <th key={h} className="text-left py-2 px-2">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {closedTrades.map(t => (
-              <tr key={t.id}
-                className={`border-b border-gray-800/50 ${
-                  (t.pnl_pct ?? 0) > 0 ? 'bg-green-950/20' : 'bg-red-950/20'
-                }`}>
-                <td className="py-2 px-2 text-gray-500">
-                  {t.closed_at ? new Date(t.closed_at).toLocaleTimeString() : '—'}
-                </td>
-                <td className="py-2 px-2 text-white">{t.symbol}</td>
-                <td className="py-2 px-2 text-gray-400">{t.timeframe}</td>
-                <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
-                <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.direction.toUpperCase()}
-                </td>
-                <td className="py-2 px-2">{fmt(t.entry, 4)}</td>
-                <td className="py-2 px-2">{t.exit_price ? fmt(t.exit_price, 4) : '—'}</td>
-                <td className="py-2 px-2 text-gray-400">{t.exit_reason ?? '—'}</td>
-                <td className={`py-2 px-2 font-bold ${pnlColor(t.pnl_pct ?? 0)}`}>
-                  {t.pnl_pct != null ? `${t.pnl_pct >= 0 ? '+' : ''}${t.pnl_pct.toFixed(2)}%` : '—'}
-                </td>
-              </tr>
-            ))}
-            {closedTrades.length === 0 && (
-              <tr><td colSpan={9} className="py-3 px-2 text-gray-600">No closed trades yet</td></tr>
+          <div className="overflow-x-auto">
+            {/* Open positions */}
+            {tab === 'open' && (
+              openWithLivePnl.length === 0 ? (
+                <div className="py-6 text-center text-gray-700 text-xs">No open positions</div>
+              ) : (
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-600 border-b border-gray-800">
+                      {['Symbol', 'TF', 'Dir', 'Pattern', 'Entry', 'Stop', 'TP1', 'TP2', 'Edge', 'Live Px', 'Live P&L', 'P&L $'].map(h => (
+                        <th key={h} className="text-left py-2 px-2">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {openWithLivePnl.map(t => (
+                      <tr key={t.id} className="border-b border-gray-800/40 hover:bg-gray-800/20">
+                        <td className="py-2 px-2 font-bold text-white">{t.symbol.replace('USDT', '')}</td>
+                        <td className="py-2 px-2 text-gray-500">{t.timeframe}</td>
+                        <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
+                          {t.direction === 'long' ? 'L' : 'S'}
+                        </td>
+                        <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
+                        <td className="py-2 px-2">{fmtPrice(t.entry)}</td>
+                        <td className="py-2 px-2 text-red-400">
+                          {fmtPrice(t.stop_loss)}{t.tp1_hit ? ' ✓BE' : ''}
+                        </td>
+                        <td className="py-2 px-2 text-blue-400">{fmtPrice(t.tp1)}</td>
+                        <td className="py-2 px-2 text-green-400">{fmtPrice(t.tp2)}</td>
+                        <td className="py-2 px-2">
+                          <span className={tierBadge(t.tier)}>{t.tier}</span>
+                          <span className="ml-1 text-gray-500">{t.edge_score.toFixed(0)}</span>
+                        </td>
+                        <td className="py-2 px-2 text-yellow-300">
+                          {fmtPrice(livePrices[t.symbol] ?? t.entry)}
+                        </td>
+                        <td className={`py-2 px-2 font-bold ${pnlClass(t.livePnl)}`}>
+                          {sign(t.livePnl)}{fmt(Math.abs(t.livePnl))}%
+                        </td>
+                        <td className={`py-2 px-2 font-bold ${pnlClass(t.livePnlAbs)}`}>
+                          {sign(t.livePnlAbs)}${fmt(Math.abs(t.livePnlAbs))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
             )}
-          </tbody>
-        </table>
-      </Section>
+
+            {/* Recent signals */}
+            {tab === 'signals' && (
+              recentSignals.length === 0 ? (
+                <div className="py-6 text-center text-gray-700 text-xs">
+                  No signals yet — waiting for closed candles
+                </div>
+              ) : (
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-600 border-b border-gray-800">
+                      {['Time', 'Symbol', 'TF', 'Pattern', 'Dir', 'Edge', 'Regime', 'Traded', 'Reason'].map(h => (
+                        <th key={h} className="text-left py-2 px-2">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentSignals.map(s => (
+                      <tr key={s.id} className="border-b border-gray-800/40 hover:bg-gray-800/20">
+                        <td className="py-2 px-2 text-gray-600">
+                          {new Date(s.detected_at).toLocaleTimeString()}
+                        </td>
+                        <td className="py-2 px-2 text-white">{s.symbol.replace('USDT', '')}</td>
+                        <td className="py-2 px-2 text-gray-500">{s.timeframe}</td>
+                        <td className="py-2 px-2 text-gray-300">{s.pattern}</td>
+                        <td className={`py-2 px-2 font-bold ${s.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
+                          {s.direction === 'long' ? 'LONG' : 'SHORT'}
+                        </td>
+                        <td className="py-2 px-2">
+                          <span className={tierBadge(s.tier)}>{s.tier}</span>
+                          <span className="ml-1 text-gray-500">{s.edge_score.toFixed(0)}</span>
+                        </td>
+                        <td className="py-2 px-2 text-gray-600 text-[10px]">{s.regime}</td>
+                        <td className="py-2 px-2">
+                          {s.acted
+                            ? <span className="text-green-400">✓ traded</span>
+                            : <span className="text-gray-700">skipped</span>}
+                        </td>
+                        <td className="py-2 px-2 text-gray-600">{s.reason ?? ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
+            )}
+
+            {/* Closed trades */}
+            {tab === 'closed' && (
+              closedTrades.length === 0 ? (
+                <div className="py-6 text-center text-gray-700 text-xs">No closed trades yet</div>
+              ) : (
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-600 border-b border-gray-800">
+                      {['Closed', 'Symbol', 'TF', 'Pattern', 'Dir', 'Entry', 'Exit', 'Via', 'P&L %', 'P&L $'].map(h => (
+                        <th key={h} className="text-left py-2 px-2">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {closedTrades.map(t => (
+                      <tr
+                        key={t.id}
+                        className={`border-b border-gray-800/30 ${
+                          (t.pnl_pct ?? 0) > 0 ? 'bg-green-950/10' : 'bg-red-950/10'
+                        }`}
+                      >
+                        <td className="py-2 px-2 text-gray-600">
+                          {t.closed_at ? new Date(t.closed_at).toLocaleString() : '—'}
+                        </td>
+                        <td className="py-2 px-2 text-white">{t.symbol.replace('USDT', '')}</td>
+                        <td className="py-2 px-2 text-gray-500">{t.timeframe}</td>
+                        <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
+                        <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
+                          {t.direction === 'long' ? 'L' : 'S'}
+                        </td>
+                        <td className="py-2 px-2">{fmtPrice(t.entry)}</td>
+                        <td className="py-2 px-2">{t.exit_price ? fmtPrice(t.exit_price) : '—'}</td>
+                        <td className="py-2 px-2 text-gray-500">{t.exit_reason ?? '—'}</td>
+                        <td className={`py-2 px-2 font-bold ${pnlClass(t.pnl_pct ?? 0)}`}>
+                          {t.pnl_pct != null ? `${sign(t.pnl_pct)}${fmt(Math.abs(t.pnl_pct))}%` : '—'}
+                        </td>
+                        <td className={`py-2 px-2 font-bold ${pnlClass(t.pnl_abs ?? 0)}`}>
+                          {t.pnl_abs != null ? `${sign(t.pnl_abs)}$${fmt(Math.abs(t.pnl_abs))}` : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -331,21 +545,10 @@ function StatCard({ label, value, sub, color }: {
   label: string; value: string; sub?: string; color?: string;
 }) {
   return (
-    <div className="bg-gray-900 rounded p-4">
-      <div className="text-gray-500 text-xs mb-1">{label}</div>
-      <div className={`text-2xl font-bold ${color ?? 'text-white'}`}>{value}</div>
-      {sub && <div className="text-gray-500 text-xs mt-1">{sub}</div>}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-6 bg-gray-900 rounded overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-800 text-gray-300 font-semibold text-xs uppercase tracking-wider">
-        {title}
-      </div>
-      <div className="overflow-x-auto">{children}</div>
+    <div className="bg-gray-900 rounded p-3">
+      <div className="text-gray-600 text-[10px] uppercase tracking-wider mb-1">{label}</div>
+      <div className={`text-lg font-bold leading-tight ${color ?? 'text-white'}`}>{value}</div>
+      {sub && <div className="text-gray-600 text-[10px] mt-0.5">{sub}</div>}
     </div>
   );
 }

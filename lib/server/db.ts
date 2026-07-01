@@ -21,6 +21,7 @@ export async function initDb(): Promise<void> {
       stop_loss   DOUBLE PRECISION NOT NULL,
       tp1         DOUBLE PRECISION NOT NULL,
       tp2         DOUBLE PRECISION NOT NULL,
+      tp1_hit     BOOLEAN NOT NULL DEFAULT false,
       size        DOUBLE PRECISION NOT NULL,
       pattern     TEXT NOT NULL,
       edge_score  DOUBLE PRECISION NOT NULL,
@@ -30,6 +31,7 @@ export async function initDb(): Promise<void> {
       exit_price  DOUBLE PRECISION,
       exit_reason TEXT,
       pnl_pct     DOUBLE PRECISION,
+      pnl_abs     DOUBLE PRECISION,
       status      TEXT NOT NULL DEFAULT 'open'
     );
 
@@ -57,6 +59,38 @@ export async function initDb(): Promise<void> {
       value TEXT NOT NULL
     );
 
+    -- RL training data: one row per signal (acted or skipped)
+    -- Outcome columns filled when the associated trade closes
+    CREATE TABLE IF NOT EXISTS rl_experience (
+      id           TEXT PRIMARY KEY,
+      signal_id    TEXT NOT NULL,
+      trade_id     TEXT,
+      symbol       TEXT NOT NULL,
+      timeframe    TEXT NOT NULL,
+      -- State features at signal time
+      pattern      TEXT NOT NULL,
+      direction    TEXT NOT NULL,
+      regime       TEXT NOT NULL,
+      edge_score   DOUBLE PRECISION NOT NULL,
+      confidence   DOUBLE PRECISION NOT NULL,
+      rsi          DOUBLE PRECISION,
+      volume_ratio DOUBLE PRECISION,
+      risk_reward  DOUBLE PRECISION NOT NULL,
+      entry        DOUBLE PRECISION NOT NULL,
+      stop_loss    DOUBLE PRECISION NOT NULL,
+      target       DOUBLE PRECISION NOT NULL,
+      hour_utc     INTEGER NOT NULL,
+      day_of_week  INTEGER NOT NULL,
+      acted        BOOLEAN NOT NULL DEFAULT false,
+      -- Outcome (filled when trade closes)
+      reward       DOUBLE PRECISION,
+      outcome      TEXT,
+      bars_held    INTEGER,
+      exit_reason  TEXT,
+      created_at   BIGINT NOT NULL,
+      updated_at   BIGINT
+    );
+
     INSERT INTO system_state (key, value)
     VALUES
       ('halted', 'false'),
@@ -67,6 +101,10 @@ export async function initDb(): Promise<void> {
       ('daily_pnl', '0'),
       ('last_reset', '0')
     ON CONFLICT (key) DO NOTHING;
+
+    -- Add columns that might be missing from earlier schema versions
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS tp1_hit BOOLEAN NOT NULL DEFAULT false;
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS pnl_abs DOUBLE PRECISION;
   `);
 }
 

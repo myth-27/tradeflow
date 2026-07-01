@@ -149,6 +149,7 @@ export default function LivePage() {
   const [chartSymbol, setChartSymbol] = useState('BTCUSDT');
   const [chartTf, setChartTf] = useState<'15' | '60'>('15');
   const [rawCandles, setRawCandles] = useState<Record<string, CandleData[]>>({});
+  const [tick, setTick] = useState(0); // increments on every successful poll
 
   const fetchState = useCallback(async () => {
     try {
@@ -161,6 +162,7 @@ export default function LivePage() {
       setError(null);
       setState(await res.json());
       setLastUpdated(new Date());
+      setTick(t => t + 1);
     } catch {
       setError('Network error — retrying…');
     }
@@ -288,11 +290,16 @@ export default function LivePage() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          {lastUpdated && (
-            <span className="text-gray-600 text-[10px]">
-              {lastUpdated.toLocaleTimeString()} · 5s refresh
+          {/* Live pulse indicator — key forces re-mount on every tick so animation restarts */}
+          <div key={tick} className="flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
             </span>
-          )}
+            <span className="text-gray-500 text-[10px]">
+              LIVE · {lastUpdated ? lastUpdated.toLocaleTimeString() : '—'}
+            </span>
+          </div>
           {error && <span className="text-yellow-500 text-xs">{error}</span>}
           <button
             onClick={toggleHalt}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { CandleChart, type CandleData } from './chart';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -145,6 +146,9 @@ export default function LivePage() {
   const [toggling, setToggling] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [tab, setTab] = useState<'open' | 'signals' | 'closed'>('open');
+  const [chartSymbol, setChartSymbol] = useState('BTCUSDT');
+  const [chartTf, setChartTf] = useState<'15' | '60'>('15');
+  const [rawCandles, setRawCandles] = useState<Record<string, CandleData[]>>({});
 
   const fetchState = useCallback(async () => {
     try {
@@ -167,6 +171,22 @@ export default function LivePage() {
     const id = setInterval(fetchState, 5_000);
     return () => clearInterval(id);
   }, [fetchState]);
+
+  // Candle data: fetch selected symbol on mount and when symbol/tf changes; refresh every 60s
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/live/candles?symbol=${chartSymbol}&tf=${chartTf}&limit=80`);
+        if (res.ok) {
+          const data: CandleData[] = await res.json();
+          setRawCandles(prev => ({ ...prev, [`${chartSymbol}:${chartTf}`]: data }));
+        }
+      } catch { /* non-critical */ }
+    };
+    load();
+    const id = setInterval(load, 60_000);
+    return () => clearInterval(id);
+  }, [chartSymbol, chartTf]);
 
   const toggleHalt = async () => {
     setToggling(true);
@@ -195,6 +215,20 @@ export default function LivePage() {
     () => openWithLivePnl.reduce((s, t) => s + t.livePnlAbs, 0),
     [openWithLivePnl],
   );
+
+  // Inject current live price into the last (forming) candle so chart feels real-time
+  const liveCandles = useMemo((): CandleData[] => {
+    const key = `${chartSymbol}:${chartTf}`;
+    const arr = rawCandles[key];
+    if (!arr?.length) return [];
+    const lp = state?.livePrices?.[chartSymbol];
+    if (!lp) return arr;
+    const last = arr[arr.length - 1];
+    return [
+      ...arr.slice(0, -1),
+      { ...last, c: lp, h: Math.max(last.h, lp), l: Math.min(last.l, lp) },
+    ];
+  }, [rawCandles, chartSymbol, chartTf, state?.livePrices]);
 
   // ── Error state ────────────────────────────────────────────────────────────
   if (error && !state) {
@@ -315,6 +349,74 @@ export default function LivePage() {
             value={`$${fmt(capital)}`}
             sub="starting"
           />
+        </div>
+
+        {/* ── Live Charts ── */}
+        <div className="bg-gray-900 rounded overflow-hidden">
+          {/* Chart header */}
+          <div className="px-4 py-2 border-b border-gray-800 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-gray-400 text-xs uppercase tracking-wider">Live Chart</span>
+            <div className="flex items-center gap-2">
+              {/* Timeframe selector */}
+              <div className="flex gap-1">
+                {(['15', '60'] as const).map(tf => (
+                  <button
+                    key={tf}
+                    onClick={() => setChartTf(tf)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                      chartTf === tf ? 'bg-blue-700 text-white' : 'text-gray-600 hover:text-gray-300'
+                    }`}
+                  >
+                    {tf === '15' ? '15m' : '1h'}
+                  </button>
+                ))}
+              </div>
+              {/* Symbol selector */}
+              <div className="flex gap-1">
+                {['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'].map(sym => {
+                  const short = sym.replace('USDT', '');
+                  const price = livePrices[sym];
+                  const hasOpenTrade = openWithLivePnl.some(t => t.symbol === sym);
+                  return (
+                    <button
+                      key={sym}
+                      onClick={() => setChartSymbol(sym)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors flex items-center gap-1 ${
+                        chartSymbol === sym
+                          ? 'bg-blue-700 text-white'
+                          : 'text-gray-500 hover:text-gray-200'
+                      }`}
+                    >
+                      {short}
+                      {hasOpenTrade && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />}
+                    </button>
+                  );
+                })}
+              </div>
+              {livePrices[chartSymbol] && (
+                <span className="text-yellow-400 text-xs font-bold ml-1">
+                  ${fmtPrice(livePrices[chartSymbol])}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Chart body */}
+          <div className="px-1 pt-1 pb-0">
+            <CandleChart
+              symbol={chartSymbol}
+              candles={liveCandles}
+              trade={openWithLivePnl.find(t => t.symbol === chartSymbol) ?? null}
+              livePrice={livePrices[chartSymbol]}
+            />
+          </div>
+
+          {/* No data state */}
+          {liveCandles.length === 0 && (
+            <div className="py-8 text-center text-gray-700 text-xs">
+              Fetching candles for {chartSymbol.replace('USDT', '')}…
+            </div>
+          )}
         </div>
 
         {/* ── Equity Curve ── */}

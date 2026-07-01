@@ -42,6 +42,8 @@ function connectBybit(tf: string): void {
     console.log(`[ws] subscribed ${topics.length} Bybit kline.${interval} streams`);
     for (const sym of SYMBOLS) {
       await seedHistoricalCandles(sym, tf, interval);
+      // stagger REST calls to avoid rate limiting
+      await new Promise(r => setTimeout(r, 300));
     }
   });
 
@@ -100,7 +102,9 @@ function connectBybit(tf: string): void {
 async function seedHistoricalCandles(symbol: string, tf: string, interval: string): Promise<void> {
   try {
     const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=300`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'TradeFlow/1.0 (paper trading engine)' },
+    });
     if (!res.ok) {
       console.warn(`[ws] Bybit seed failed ${symbol} ${tf}: ${res.status}`);
       return;

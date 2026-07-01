@@ -22,7 +22,7 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 // Symbols that fire signals (1h streams are HTF filter only)
 const SIGNAL_TIMEFRAMES = new Set(['15m']);
 
-const MIN_CANDLES = 100;
+const MIN_CANDLES = 50;
 const MIN_EDGE = 60;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');

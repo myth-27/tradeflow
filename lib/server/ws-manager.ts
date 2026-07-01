@@ -100,30 +100,52 @@ function connectBybit(tf: string): void {
 }
 
 async function seedHistoricalCandles(symbol: string, tf: string, interval: string): Promise<void> {
+  const headers = { 'User-Agent': 'TradeFlow/1.0 paper-trading-engine' };
+
+  // 1. Try Bybit v5 linear futures
   try {
     const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=300`;
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'TradeFlow/1.0 (paper trading engine)' },
-    });
-    if (!res.ok) {
-      console.warn(`[ws] Bybit seed failed ${symbol} ${tf}: ${res.status}`);
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const data = await res.json() as { result: { list: string[][] } };
+      const klines = data.result?.list ?? [];
+      for (const k of [...klines].reverse()) {
+        pushCandle(symbol, tf, {
+          time: parseInt(k[0]) / 1000,
+          open: parseFloat(k[1]),
+          high: parseFloat(k[2]),
+          low: parseFloat(k[3]),
+          close: parseFloat(k[4]),
+          volume: parseFloat(k[5]),
+        }, true);
+      }
+      console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf} (Bybit)`);
       return;
     }
-    const data = await res.json() as { result: { list: string[][] } };
-    const klines = data.result?.list ?? [];
-    // Bybit returns newest-first — reverse to get chronological order
-    for (const k of [...klines].reverse()) {
-      pushCandle(symbol, tf, {
-        time: parseInt(k[0]) / 1000,
-        open: parseFloat(k[1]),
-        high: parseFloat(k[2]),
-        low: parseFloat(k[3]),
-        close: parseFloat(k[4]),
-        volume: parseFloat(k[5]),
-      }, true);
+  } catch { /* fall through */ }
+
+  // 2. Fallback: Binance US (accessible from Railway US datacenters)
+  try {
+    const binanceTf = tf; // '15m' or '1h' — same format as Binance
+    const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${binanceTf}&limit=300`;
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const klines = await res.json() as string[][];
+      for (const k of klines) {
+        pushCandle(symbol, tf, {
+          time: parseInt(k[0]) / 1000,
+          open: parseFloat(k[1]),
+          high: parseFloat(k[2]),
+          low: parseFloat(k[3]),
+          close: parseFloat(k[4]),
+          volume: parseFloat(k[5]),
+        }, true);
+      }
+      console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf} (Binance US)`);
+      return;
     }
-    console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf}`);
-  } catch (err) {
-    console.error(`[ws] seed error ${symbol} ${tf}:`, err);
-  }
+  } catch { /* fall through */ }
+
+  // 3. Both REST sources unavailable — live WebSocket will warm up over time
+  console.warn(`[ws] seed skipped ${symbol} ${tf} — warming up from live stream`);
 }

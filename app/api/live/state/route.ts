@@ -52,25 +52,42 @@ export async function GET() {
       });
 
     // In-memory prices are populated by Railway engine.
-    // On Vercel (dashboard-only), fall back to CoinGecko (no geo-restrictions).
+    // On Vercel (dashboard-only), fall back to Bybit ticker API (confirmed accessible from Vercel/AWS).
     let livePrices = getLivePrices();
     if (Object.keys(livePrices).length === 0) {
       try {
-        const cgRes = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple&vs_currencies=usd',
-          { next: { revalidate: 0 } },
+        const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+        const headers = { 'User-Agent': 'TradeFlow/1.0 paper-trading-engine' };
+        // Fetch all linear tickers in one request, then filter
+        const bybitRes = await fetch(
+          'https://api.bybit.com/v5/market/tickers?category=linear',
+          { headers, next: { revalidate: 0 } },
         );
-        if (cgRes.ok) {
-          const cg = await cgRes.json() as Record<string, { usd: number }>;
-          livePrices = {
-            BTCUSDT: cg.bitcoin?.usd ?? 0,
-            ETHUSDT: cg.ethereum?.usd ?? 0,
-            SOLUSDT: cg.solana?.usd ?? 0,
-            BNBUSDT: cg.binancecoin?.usd ?? 0,
-            XRPUSDT: cg.ripple?.usd ?? 0,
-          };
+        if (bybitRes.ok) {
+          const bybitData = await bybitRes.json() as { result: { list: Array<{ symbol: string; lastPrice: string }> } };
+          const symbolSet = new Set(symbols);
+          livePrices = Object.fromEntries(
+            (bybitData.result?.list ?? [])
+              .filter(t => symbolSet.has(t.symbol))
+              .map(t => [t.symbol, parseFloat(t.lastPrice)]),
+          );
         }
       } catch { /* non-critical */ }
+
+      // Fallback: Binance US if Bybit also fails
+      if (Object.keys(livePrices).length === 0) {
+        try {
+          const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+          const buRes = await fetch(
+            `https://api.binance.us/api/v3/ticker/price?symbols=${JSON.stringify(symbols)}`,
+            { next: { revalidate: 0 } },
+          );
+          if (buRes.ok) {
+            const data: Array<{ symbol: string; price: string }> = await buRes.json();
+            livePrices = Object.fromEntries(data.map(d => [d.symbol, parseFloat(d.price)]));
+          }
+        } catch { /* non-critical */ }
+      }
     }
 
     return NextResponse.json({

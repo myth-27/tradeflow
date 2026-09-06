@@ -109,6 +109,7 @@ export async function GET() {
       livePrices,
     });
   } catch (err) {
+    const e = err as Error & { code?: string };
     console.error('[live/state] error:', err);
     // DB unreachable (e.g. Vercel using wrong DATABASE_URL) — return empty state with live prices
     // so the dashboard loads rather than hanging on "Connecting…"
@@ -135,6 +136,7 @@ export async function GET() {
       symbolStats: {}, equityCurve: [],
       livePrices: fallbackPrices,
       dbError: true,
+      dbErrorMsg: `${e.code ?? ''} ${e.message ?? ''}`.trim(),
     });
   }
 }

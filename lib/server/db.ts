@@ -7,28 +7,15 @@ export function getPool(): Pool {
     const url = process.env.DATABASE_URL ?? '';
 
     if (url.includes('rlwy.net') || url.includes('railway.app')) {
-      // Railway's external TCP proxy (rlwy.net) is TLS-first: it expects a raw TLS
-      // ClientHello immediately, before any Postgres protocol bytes.
-      // pg normally sends an 8-byte SSLRequest first → Railway treats this as
-      // malformed TLS and returns an unexpected byte → pg throws "There was an error
-      // establishing an SSL connection".
-      //
-      // Fix: sslNegotiation: 'direct' (pg 8.12+) skips SSLRequest entirely.
-      // pg does TCP connect → immediately upgrades to TLS → then runs Postgres.
+      // Railway's external TCP proxy: both SSLRequest and TLS-direct approaches fail.
+      // SSLRequest gets an unexpected response byte (not 'S'/'N').
+      // Direct TLS gets "wrong version number" — the proxy returns non-TLS bytes.
+      // Plain connection (no SSL) avoids negotiation entirely; Railway's proxy is
+      // a raw TCP pass-through and Postgres on the backend does not require SSL.
       const parsed = new URL(url);
-      // sslNegotiation: 'direct' is in pg 8.12+ but types may lag — use any
-      const railwayCfg = {
-        user: decodeURIComponent(parsed.username),
-        password: decodeURIComponent(parsed.password),
-        host: parsed.hostname,
-        port: parseInt(parsed.port) || 5432,
-        database: parsed.pathname.slice(1),
-        max: 5,
-        ssl: { rejectUnauthorized: false },
-        sslnegotiation: 'direct', // skips SSLRequest — pg reads lowercase 'sslnegotiation'
-      };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      _pool = new Pool(railwayCfg as any);
+      parsed.searchParams.delete('sslmode');
+      parsed.searchParams.set('sslmode', 'disable');
+      _pool = new Pool({ connectionString: parsed.toString(), max: 5 });
     } else {
       _pool = new Pool({ connectionString: url, max: 5 });
     }

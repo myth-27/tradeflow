@@ -4,20 +4,13 @@ let _pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!_pool) {
-    const connStr = process.env.DATABASE_URL ?? '';
-    // Railway external proxy (rlwy.net) requires SSL with self-signed cert tolerance.
-    // Internal URL (railway.internal) uses plain TCP — no SSL.
-    const isExternal = connStr.includes('rlwy.net') || connStr.includes('railway.app');
-    _pool = new Pool({
-      connectionString: connStr,
-      max: 5,
-      ...(isExternal ? {
-        ssl: {
-          rejectUnauthorized: false,
-          checkServerIdentity: () => undefined,
-        },
-      } : {}),
-    });
+    // Railway TCP proxy (rlwy.net) is a plain forwarder — ssl option breaks the handshake.
+    // Pass sslmode=disable in the URL to prevent pg from attempting SSL.
+    const raw = process.env.DATABASE_URL ?? '';
+    const connStr = raw.includes('rlwy.net') || raw.includes('railway.app')
+      ? raw.replace(/\?.*$/, '') + '?sslmode=disable'
+      : raw;
+    _pool = new Pool({ connectionString: connStr, max: 5 });
   }
   return _pool;
 }

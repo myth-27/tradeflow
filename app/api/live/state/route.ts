@@ -138,6 +138,7 @@ export async function GET() {
       livePrices: fallbackPrices,
       dbError: true,
       dbErrorMsg: `${e.code ?? ''} ${e.message ?? ''}`.trim(),
+      dbHost: (() => { try { return new URL(process.env.DATABASE_URL ?? '').hostname; } catch { return 'parse-fail'; } })(),
     });
   }
 }

@@ -4,7 +4,11 @@ let _pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!_pool) {
-    _pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
+    _pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 5,
+      ssl: { rejectUnauthorized: false }, // required for Railway Postgres (SSL enabled by default)
+    });
   }
   return _pool;
 }

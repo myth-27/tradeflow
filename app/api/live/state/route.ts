@@ -110,6 +110,31 @@ export async function GET() {
     });
   } catch (err) {
     console.error('[live/state] error:', err);
-    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    // DB unreachable (e.g. Vercel using wrong DATABASE_URL) — return empty state with live prices
+    // so the dashboard loads rather than hanging on "Connecting…"
+    let fallbackPrices: Record<string, number> = {};
+    try {
+      const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+      const r = await fetch('https://api.bybit.com/v5/market/tickers?category=linear', {
+        headers: { 'User-Agent': 'TradeFlow/1.0' },
+        next: { revalidate: 0 },
+      });
+      if (r.ok) {
+        const d = await r.json() as { result: { list: Array<{ symbol: string; lastPrice: string }> } };
+        const s = new Set(symbols);
+        fallbackPrices = Object.fromEntries(
+          (d.result?.list ?? []).filter(t => s.has(t.symbol)).map(t => [t.symbol, parseFloat(t.lastPrice)]),
+        );
+      }
+    } catch { /* non-critical */ }
+    return NextResponse.json({
+      halted: false, engineEnabled: false, capital: 0,
+      totalPnlAbs: 0, totalPnlPct: 0, dailyPnl: 0,
+      totalTrades: 0, wins: 0, losses: 0, winRate: 0,
+      openTrades: [], closedTrades: [], recentSignals: [],
+      symbolStats: {}, equityCurve: [],
+      livePrices: fallbackPrices,
+      dbError: true,
+    });
   }
 }

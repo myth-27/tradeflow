@@ -4,10 +4,14 @@ let _pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!_pool) {
+    const connStr = process.env.DATABASE_URL ?? '';
+    // Internal Railway URL (railway.internal) doesn't support SSL; external URLs require it
+    const needsSSL = !connStr.includes('railway.internal') &&
+      (connStr.includes('rlwy.net') || connStr.includes('railway.app') || connStr.includes('sslmode=require'));
     _pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
+      connectionString: connStr,
       max: 5,
-      ssl: { rejectUnauthorized: false }, // required for Railway Postgres (SSL enabled by default)
+      ...(needsSSL ? { ssl: { rejectUnauthorized: false } } : {}),
     });
   }
   return _pool;

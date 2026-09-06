@@ -137,6 +137,7 @@ export async function GET() {
       symbolStats: {}, equityCurve: [],
       livePrices: fallbackPrices,
       dbError: true,
+      dbErrorMsg: `${e.code ?? ''} ${e.message ?? ''}`.trim(),
     });
   }
 }

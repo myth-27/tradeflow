@@ -139,6 +139,8 @@ export async function GET() {
       dbError: true,
       dbErrorMsg: `${e.code ?? ''} ${e.message ?? ''}`.trim(),
       dbHost: (() => { try { return new URL(process.env.DATABASE_URL ?? '').hostname; } catch { return 'parse-fail'; } })(),
+      dbPort: (() => { try { return new URL(process.env.DATABASE_URL ?? '').port; } catch { return 'parse-fail'; } })(),
+      dbSSLMode: (() => { try { return new URL(process.env.DATABASE_URL ?? '').searchParams.get('sslmode') ?? 'none'; } catch { return 'parse-fail'; } })(),
     });
   }
 }

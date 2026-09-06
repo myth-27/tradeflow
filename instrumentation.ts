@@ -24,7 +24,8 @@ export async function register(): Promise<void> {
       connected = true;
       break;
     } catch (err) {
-      console.error(`[instrumentation] DB connect attempt ${attempt}/5 failed:`, err);
+      const e = err as Error & { code?: string; cause?: Error };
+      console.error(`[instrumentation] DB connect attempt ${attempt}/5 failed: ${e.message} (code=${e.code ?? 'none'}) cause=${e.cause?.message ?? 'none'}`);
       if (attempt < 5) await new Promise(r => setTimeout(r, attempt * 3000));
     }
   }

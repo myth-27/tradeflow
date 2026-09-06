@@ -7,15 +7,36 @@ export function getPool(): Pool {
     const url = process.env.DATABASE_URL ?? '';
 
     if (url.includes('rlwy.net') || url.includes('railway.app')) {
-      // Railway's external TCP proxy: both SSLRequest and TLS-direct approaches fail.
-      // SSLRequest gets an unexpected response byte (not 'S'/'N').
-      // Direct TLS gets "wrong version number" — the proxy returns non-TLS bytes.
-      // Plain connection (no SSL) avoids negotiation entirely; Railway's proxy is
-      // a raw TCP pass-through and Postgres on the backend does not require SSL.
+      // Railway's external TCP proxy (rlwy.net) failures:
+      // - SSLRequest: proxy responds with TLS bytes (not 'S'/'N') → pg error
+      // - sslnegotiation:'direct': pg adds ALPNProtocols:['postgresql'] which Railway
+      //   doesn't support → TLS fails with "wrong version number"
+      // - sslmode=disable: Postgres backend requires SSL → closes connection
+      //
+      // Fix: stream factory returns a TLS socket WITHOUT ALPN. pg uses ssl:false
+      // so it won't add SSL overhead — it just sends Postgres bytes through whatever
+      // stream we give it. TLS socket buffers writes until handshake completes.
+      // The .connect() is patched to a no-op because tls.connect() auto-connects.
       const parsed = new URL(url);
-      parsed.searchParams.delete('sslmode');
-      parsed.searchParams.set('sslmode', 'disable');
-      _pool = new Pool({ connectionString: parsed.toString(), max: 5 });
+      const host = parsed.hostname;
+      const port = parseInt(parsed.port) || 5432;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+      const tls = require('tls') as any;
+      _pool = new Pool({
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+        host, port,
+        database: parsed.pathname.slice(1),
+        max: 5,
+        ssl: false, // pg must not add SSLRequest or ALPN — handled by our stream
+        stream: () => {
+          // Create TLS socket without ALPN extension (key difference from sslnegotiation:'direct')
+          const sock = tls.connect({ host, port, rejectUnauthorized: false, servername: host });
+          // Patch .connect() to no-op: pg calls it but the socket is already connecting
+          sock.connect = () => sock;
+          return sock;
+        },
+      } as any);
     } else {
       _pool = new Pool({ connectionString: url, max: 5 });
     }

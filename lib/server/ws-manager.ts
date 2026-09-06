@@ -13,7 +13,7 @@ const TIMEFRAMES = Array.from(new Set(STREAMS.map(s => s.tf)));
 const SYMBOLS = Array.from(new Set(STREAMS.map(s => s.symbol)));
 
 // Bybit interval codes
-const TF_MAP: Record<string, string> = { '15m': '15', '1h': '60' };
+const TF_MAP: Record<string, string> = { '5m': '5', '15m': '15', '1h': '60' };
 
 export function startWsManager(): void {
   for (const tf of TIMEFRAMES) {

@@ -5,22 +5,20 @@ import { quickEdgeEstimate } from '@/lib/edge-score';
 import { getPool, getState, setState } from './db';
 import { getCandles, getLivePrice } from './candle-store';
 
-// 5 cryptos × 2 timeframes — 1h streams feed the HTF regime filter for 15m signals
+const SYMBOLS = [
+  'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
+  'AVAXUSDT', 'LINKUSDT', 'DOGEUSDT', 'ADAUSDT', 'DOTUSDT',
+];
+
+// 10 cryptos × 3 timeframes — 1h is HTF regime filter, 5m + 15m fire signals
 export const STREAMS: Array<{ symbol: string; tf: string }> = [
-  { symbol: 'BTCUSDT', tf: '15m' },
-  { symbol: 'ETHUSDT', tf: '15m' },
-  { symbol: 'SOLUSDT', tf: '15m' },
-  { symbol: 'BNBUSDT', tf: '15m' },
-  { symbol: 'XRPUSDT', tf: '15m' },
-  { symbol: 'BTCUSDT', tf: '1h' },
-  { symbol: 'ETHUSDT', tf: '1h' },
-  { symbol: 'SOLUSDT', tf: '1h' },
-  { symbol: 'BNBUSDT', tf: '1h' },
-  { symbol: 'XRPUSDT', tf: '1h' },
+  ...SYMBOLS.map(s => ({ symbol: s, tf: '5m' })),
+  ...SYMBOLS.map(s => ({ symbol: s, tf: '15m' })),
+  ...SYMBOLS.map(s => ({ symbol: s, tf: '1h' })),
 ];
 
 // Symbols that fire signals (1h streams are HTF filter only)
-const SIGNAL_TIMEFRAMES = new Set(['15m']);
+const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
 const MIN_EDGE = 60;

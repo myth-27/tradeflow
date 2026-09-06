@@ -1,6 +1,18 @@
-import { v4 as uuidv4 } from 'uuid';
 import { getPool, getState, setState } from './db';
-import { getLivePrice } from './candle-store';
+import { getLivePrice, getCandles } from './candle-store';
+
+function calcATR(symbol: string, tf: string, period = 14): number {
+  const candles = getCandles(symbol, tf);
+  if (candles.length < period + 1) return 0;
+  const trs = candles.slice(1).map((c, i) => Math.max(
+    c.high - c.low,
+    Math.abs(c.high - candles[i].close),
+    Math.abs(c.low - candles[i].close),
+  ));
+  let atr = trs.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < trs.length; i++) atr = (atr * (period - 1) + trs[i]) / period;
+  return atr;
+}
 
 let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -40,13 +52,23 @@ async function checkOpenTrades(): Promise<void> {
       } else if (price >= tp2) {
         exitReason = 'tp2';
         exitPrice = tp2;
-      } else if (price >= tp1 && !tp1_hit) {
+      } else if (!tp1_hit && price >= tp1) {
+        // TP1 hit: move SL to breakeven, start trailing
         await pool.query(
           `UPDATE paper_trades SET stop_loss = $1, tp1_hit = true WHERE id = $2`,
           [entry, id],
         );
-        console.log(`[monitor] ${trade.symbol} TP1 hit — stop moved to breakeven`);
+        console.log(`[monitor] ${trade.symbol} TP1 hit — SL moved to breakeven, trailing active`);
         continue;
+      } else if (tp1_hit) {
+        // Trailing SL: 1.5× ATR below current price, never lower than breakeven
+        const atr = calcATR(trade.symbol, trade.timeframe);
+        if (atr > 0) {
+          const trailSL = Math.max(price - atr * 1.5, entry);
+          if (trailSL > stop_loss) {
+            await pool.query(`UPDATE paper_trades SET stop_loss = $1 WHERE id = $2`, [trailSL, id]);
+          }
+        }
       }
     } else {
       if (price >= stop_loss) {
@@ -55,13 +77,23 @@ async function checkOpenTrades(): Promise<void> {
       } else if (price <= tp2) {
         exitReason = 'tp2';
         exitPrice = tp2;
-      } else if (price <= tp1 && !tp1_hit) {
+      } else if (!tp1_hit && price <= tp1) {
+        // TP1 hit: move SL to breakeven, start trailing
         await pool.query(
           `UPDATE paper_trades SET stop_loss = $1, tp1_hit = true WHERE id = $2`,
           [entry, id],
         );
-        console.log(`[monitor] ${trade.symbol} TP1 hit — stop moved to breakeven`);
+        console.log(`[monitor] ${trade.symbol} TP1 hit — SL moved to breakeven, trailing active`);
         continue;
+      } else if (tp1_hit) {
+        // Trailing SL: 1.5× ATR above current price, never higher than breakeven
+        const atr = calcATR(trade.symbol, trade.timeframe);
+        if (atr > 0) {
+          const trailSL = Math.min(price + atr * 1.5, entry);
+          if (trailSL < stop_loss) {
+            await pool.query(`UPDATE paper_trades SET stop_loss = $1 WHERE id = $2`, [trailSL, id]);
+          }
+        }
       }
     }
 

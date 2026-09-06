@@ -15,14 +15,26 @@ export async function register(): Promise<void> {
   const { startWsManager } = await import('@/lib/server/ws-manager');
   const { startTradeMonitor } = await import('@/lib/server/trade-monitor');
 
-  try {
-    await initDb();
-    console.log('[instrumentation] Database ready');
-
-    startWsManager();
-    startTradeMonitor();
-    console.log('[instrumentation] Paper trading engine started');
-  } catch (err) {
-    console.error('[instrumentation] Engine startup failed:', err);
+  // Retry DB init — Postgres may not be ready immediately after container start
+  let connected = false;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      await initDb();
+      console.log('[instrumentation] Database ready');
+      connected = true;
+      break;
+    } catch (err) {
+      console.error(`[instrumentation] DB connect attempt ${attempt}/5 failed:`, err);
+      if (attempt < 5) await new Promise(r => setTimeout(r, attempt * 3000));
+    }
   }
+
+  if (!connected) {
+    console.error('[instrumentation] Engine startup failed — could not connect to DB after 5 attempts');
+    return;
+  }
+
+  startWsManager();
+  startTradeMonitor();
+  console.log('[instrumentation] Paper trading engine started');
 }

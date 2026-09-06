@@ -1,6 +1,4 @@
 import { Pool } from 'pg';
-import tls from 'tls';
-import { URL as NodeURL } from 'url';
 
 let _pool: Pool | null = null;
 
@@ -9,23 +7,28 @@ export function getPool(): Pool {
     const url = process.env.DATABASE_URL ?? '';
 
     if (url.includes('rlwy.net') || url.includes('railway.app')) {
-      // Railway's external TCP proxy is TLS-first: it expects a raw TLS ClientHello
-      // before any Postgres protocol bytes. pg normally sends an 8-byte SSLRequest
-      // first, which Railway's proxy treats as malformed TLS and rejects.
-      // Fix: pre-establish TLS via the `stream` factory so pg skips SSLRequest.
-      const parsed = new NodeURL(url);
-      const host = parsed.hostname;
-      const port = parseInt(parsed.port) || 5432;
-      _pool = new Pool({
+      // Railway's external TCP proxy (rlwy.net) is TLS-first: it expects a raw TLS
+      // ClientHello immediately, before any Postgres protocol bytes.
+      // pg normally sends an 8-byte SSLRequest first → Railway treats this as
+      // malformed TLS and returns an unexpected byte → pg throws "There was an error
+      // establishing an SSL connection".
+      //
+      // Fix: sslNegotiation: 'direct' (pg 8.12+) skips SSLRequest entirely.
+      // pg does TCP connect → immediately upgrades to TLS → then runs Postgres.
+      const parsed = new URL(url);
+      // sslNegotiation: 'direct' is in pg 8.12+ but types may lag — use any
+      const railwayCfg = {
         user: decodeURIComponent(parsed.username),
         password: decodeURIComponent(parsed.password),
-        host,
-        port,
+        host: parsed.hostname,
+        port: parseInt(parsed.port) || 5432,
         database: parsed.pathname.slice(1),
         max: 5,
-        ssl: false,   // skip SSLRequest — TLS is already established by the stream factory
-        stream: () => tls.connect({ host, port, rejectUnauthorized: false, servername: host }),
-      });
+        ssl: { rejectUnauthorized: false },
+        sslNegotiation: 'direct', // skips SSLRequest, Railway's proxy gets TLS ClientHello
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _pool = new Pool(railwayCfg as any);
     } else {
       _pool = new Pool({ connectionString: url, max: 5 });
     }

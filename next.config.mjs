@@ -1,11 +1,13 @@
 /** @type {import('next').NextConfig} */
 const isVercel = !!process.env.VERCEL;
 
+// Packages that use Node built-ins (fs/net/tls) and must never be bundled by webpack
+const NODE_ONLY = ['pg', 'pg-native', 'pg-pool', 'pg-connection-string', 'pgpass', 'ws', 'uuid'];
+
 const nextConfig = {
-  // standalone is needed for Railway (Docker). Vercel handles its own bundling.
   output: isVercel ? undefined : 'standalone',
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'prisma', 'pg', 'ws', 'uuid'],
+    serverComponentsExternalPackages: NODE_ONLY,
     instrumentationHook: true,
   },
   typescript: {
@@ -13,11 +15,12 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
-      // pg and ws depend on Node built-ins (fs, net, tls) — keep them external
-      const nodeExternals = ['pg', 'pg-native', 'pg-connection-string', 'ws'];
-      if (Array.isArray(config.externals)) {
-        config.externals.push(...nodeExternals);
-      }
+      // Preserve existing externals (may be array or function) then append ours
+      const prev = config.externals;
+      config.externals = [
+        ...(Array.isArray(prev) ? prev : prev ? [prev] : []),
+        ...NODE_ONLY,
+      ];
     }
     return config;
   },

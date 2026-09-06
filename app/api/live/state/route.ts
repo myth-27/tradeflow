@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
-import { getPool, getState } from '@/lib/server/db';
+import { getPool, getState, initDb } from '@/lib/server/db';
 import { getLivePrices } from '@/lib/server/candle-store';
 
 export async function GET() {
@@ -11,6 +11,7 @@ export async function GET() {
   }
 
   try {
+    await initDb(); // creates tables if they don't exist yet (idempotent)
     const pool = getPool();
     const [state, openRes, closedRes, signalsRes] = await Promise.all([
       getState(),

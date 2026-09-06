@@ -4,7 +4,12 @@ let _pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!_pool) {
-    _pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
+    const url = process.env.DATABASE_URL ?? '';
+    // External Railway proxy (rlwy.net) needs SSL; internal URL doesn't support it
+    const ssl = (url.includes('rlwy.net') || url.includes('railway.app'))
+      ? { rejectUnauthorized: false }
+      : undefined;
+    _pool = new Pool({ connectionString: url, max: 5, ...(ssl ? { ssl } : {}) });
   }
   return _pool;
 }

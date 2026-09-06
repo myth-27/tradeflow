@@ -1,15 +1,34 @@
 import { Pool } from 'pg';
+import tls from 'tls';
+import { URL as NodeURL } from 'url';
 
 let _pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!_pool) {
     const url = process.env.DATABASE_URL ?? '';
-    // External Railway proxy (rlwy.net) needs SSL; internal URL doesn't support it
-    const ssl = (url.includes('rlwy.net') || url.includes('railway.app'))
-      ? { rejectUnauthorized: false }
-      : undefined;
-    _pool = new Pool({ connectionString: url, max: 5, ...(ssl ? { ssl } : {}) });
+
+    if (url.includes('rlwy.net') || url.includes('railway.app')) {
+      // Railway's external TCP proxy is TLS-first: it expects a raw TLS ClientHello
+      // before any Postgres protocol bytes. pg normally sends an 8-byte SSLRequest
+      // first, which Railway's proxy treats as malformed TLS and rejects.
+      // Fix: pre-establish TLS via the `stream` factory so pg skips SSLRequest.
+      const parsed = new NodeURL(url);
+      const host = parsed.hostname;
+      const port = parseInt(parsed.port) || 5432;
+      _pool = new Pool({
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+        host,
+        port,
+        database: parsed.pathname.slice(1),
+        max: 5,
+        ssl: false,   // skip SSLRequest — TLS is already established by the stream factory
+        stream: () => tls.connect({ host, port, rejectUnauthorized: false, servername: host }),
+      });
+    } else {
+      _pool = new Pool({ connectionString: url, max: 5 });
+    }
   }
   return _pool;
 }

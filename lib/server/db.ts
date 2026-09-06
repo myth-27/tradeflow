@@ -25,7 +25,7 @@ export function getPool(): Pool {
         database: parsed.pathname.slice(1),
         max: 5,
         ssl: { rejectUnauthorized: false },
-        sslNegotiation: 'direct', // skips SSLRequest, Railway's proxy gets TLS ClientHello
+        sslnegotiation: 'direct', // skips SSLRequest — pg reads lowercase 'sslnegotiation'
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       _pool = new Pool(railwayCfg as any);

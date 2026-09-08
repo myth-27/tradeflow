@@ -104,7 +104,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
 
   // 1. Try Bybit v5 linear futures
   try {
-    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=300`;
+    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=500`;
     const res = await fetch(url, { headers });
     if (res.ok) {
       const data = await res.json() as { result: { list: string[][] } };
@@ -127,7 +127,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
   // 2. Fallback: Binance US (accessible from Railway US datacenters)
   try {
     const binanceTf = tf; // '15m' or '1h' — same format as Binance
-    const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${binanceTf}&limit=300`;
+    const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${binanceTf}&limit=500`;
     const res = await fetch(url, { headers });
     if (res.ok) {
       const klines = await res.json() as string[][];

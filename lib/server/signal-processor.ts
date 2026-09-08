@@ -21,14 +21,18 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-const MIN_EDGE = 60;
+const MIN_EDGE = 70;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
 const MAX_DAILY_LOSS_PCT = 0.03;
 
 const lastSignalTime = new Map<string, number>();
-const COOLDOWN_MS = 30 * 60 * 1000;
+
+// Shorter cooldown on 5m (more frequent closes) vs 15m
+function getCooldownMs(tf: string): number {
+  return tf === '5m' ? 15 * 60 * 1000 : 30 * 60 * 1000;
+}
 
 export async function processNewCandle(symbol: string, tf: string): Promise<void> {
   if (!SIGNAL_TIMEFRAMES.has(tf)) return;
@@ -41,7 +45,7 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
 
   const ck = `${symbol}:${tf}`;
   const lastFired = lastSignalTime.get(ck) ?? 0;
-  if (Date.now() - lastFired < COOLDOWN_MS) return;
+  if (Date.now() - lastFired < getCooldownMs(tf)) return;
 
   const candles = getCandles(symbol, tf);
   if (candles.length < MIN_CANDLES) return;

@@ -99,9 +99,17 @@ async function checkOpenTrades(): Promise<void> {
 
     if (!exitReason) continue;
 
-    pnlPct = direction === 'long'
-      ? ((exitPrice - entry) / entry) * 100
-      : ((entry - exitPrice) / entry) * 100;
+    // If TP1 was hit, 50% was already closed at tp1 price — weight the P&L accordingly.
+    // Without this, a breakeven stop after TP1 would incorrectly show 0% instead of the tp1 gain.
+    if (tp1_hit) {
+      pnlPct = direction === 'long'
+        ? ((tp1 - entry) * 0.5 + (exitPrice - entry) * 0.5) / entry * 100
+        : ((entry - tp1) * 0.5 + (entry - exitPrice) * 0.5) / entry * 100;
+    } else {
+      pnlPct = direction === 'long'
+        ? ((exitPrice - entry) / entry) * 100
+        : ((entry - exitPrice) / entry) * 100;
+    }
 
     const pnlAbs = (pnlPct / 100) * entry * size;
     const now = Date.now();

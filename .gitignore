@@ -51,3 +51,8 @@ tradeflow.db
 
 # training exports (local research data)
 training-exports/
+
+.vercel
+
+# Local data backups
+data/

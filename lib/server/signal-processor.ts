@@ -7,7 +7,8 @@ import { getCandles, getLivePrice } from './candle-store';
 
 const SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
-  'AVAXUSDT', 'LINKUSDT', 'DOGEUSDT', 'ADAUSDT', 'DOTUSDT',
+  'AVAXUSDT', 'LINKUSDT', 'DOGEUSDT', 'DOTUSDT',
+  // ADAUSDT removed: price ~$0.20 causes sub-cent stop distances that noise hits immediately
 ];
 
 // 10 cryptos × 3 timeframes — 1h is HTF regime filter, 5m + 15m fire signals
@@ -21,7 +22,7 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-const MIN_EDGE = 70;
+const MIN_EDGE = 65;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
@@ -61,8 +62,11 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   const patterns = runAllPatterns(candles);
   if (!patterns.length) return;
 
+  // Shooting Star excluded: 0W/5L across all live trades — poor edge in trending markets
+  const EXCLUDED_PATTERNS = new Set(['Shooting Star']);
+
   const best = patterns
-    .filter(p => p.type !== 'neutral' && !p.conflicting)
+    .filter(p => p.type !== 'neutral' && !p.conflicting && !EXCLUDED_PATTERNS.has(p.name))
     .sort((a, b) => b.confidence - a.confidence)[0];
   if (!best) return;
 

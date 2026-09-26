@@ -126,6 +126,10 @@ async function checkOpenTrades(): Promise<void> {
     const currentDailyPnl = parseFloat(state['daily_pnl'] ?? '0');
     await setState('daily_pnl', String(currentDailyPnl + pnlAbs));
 
+    // Move capital with actual P&L so equity curve reflects real account value
+    const currentCapital = parseFloat(state['capital'] ?? '0');
+    await setState('capital', String(parseFloat((currentCapital + pnlAbs).toFixed(2))));
+
     if (pnlPct > 0) {
       await setState('wins', String(parseInt(state['wins'] ?? '0') + 1));
     } else {

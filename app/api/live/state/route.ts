@@ -91,12 +91,16 @@ export async function GET() {
       }
     }
 
+    const startingCapital = parseFloat(process.env.STARTING_CAPITAL ?? '500000');
+    const currentEquity = parseFloat((capital + totalPnlAbs).toFixed(2));
+
     return NextResponse.json({
       halted: state['halted'] === 'true',
       engineEnabled: process.env.ENABLE_ENGINE === 'true',
       capital,
+      currentEquity,
       totalPnlAbs: parseFloat(totalPnlAbs.toFixed(2)),
-      totalPnlPct: capital > 0 ? parseFloat(((totalPnlAbs / capital) * 100).toFixed(2)) : 0,
+      totalPnlPct: startingCapital > 0 ? parseFloat(((totalPnlAbs / startingCapital) * 100).toFixed(2)) : 0,
       dailyPnl: parseFloat(state['daily_pnl'] ?? '0'),
       totalTrades: parseInt(state['total_trades'] ?? '0'),
       wins,

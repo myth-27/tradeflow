@@ -35,6 +35,9 @@ function getCooldownMs(tf: string): number {
   return tf === '5m' ? 15 * 60 * 1000 : 30 * 60 * 1000;
 }
 
+// Single-candle reversal patterns: no confirmation context, 0W/7L in live data
+const EXCLUDED_PATTERNS = new Set(['Shooting Star', 'Hammer']);
+
 export async function processNewCandle(symbol: string, tf: string): Promise<void> {
   if (!SIGNAL_TIMEFRAMES.has(tf)) return;
 
@@ -51,19 +54,17 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   const candles = getCandles(symbol, tf);
   if (candles.length < MIN_CANDLES) return;
 
-  // HTF regime filter — skip if 1h is ranging/low_volatility
+  // HTF regime filter — hoist htfRegime so direction-alignment check can use it later
   const htfCandles = getCandles(symbol, '1h');
+  let htfRegime = '';
   if (htfCandles.length >= 50) {
-    const htfRegime = classifyRegime(htfCandles);
+    htfRegime = classifyRegime(htfCandles);
     if (htfRegime === 'ranging' || htfRegime === 'low_volatility') return;
   }
 
   const regime = classifyRegime(candles);
   const patterns = runAllPatterns(candles);
   if (!patterns.length) return;
-
-  // Shooting Star excluded: 0W/5L across all live trades — poor edge in trending markets
-  const EXCLUDED_PATTERNS = new Set(['Shooting Star']);
 
   const best = patterns
     .filter(p => p.type !== 'neutral' && !p.conflicting && !EXCLUDED_PATTERNS.has(p.name))
@@ -79,6 +80,10 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
 
   if (direction === 'long' && (best.stopLoss >= entry || best.target <= entry)) return;
   if (direction === 'short' && (best.stopLoss <= entry || best.target >= entry)) return;
+
+  // Minimum stop distance: 0.3% of entry — tighter stops get hit by candle noise before price moves
+  const stopDistPrice = Math.abs(entry - best.stopLoss);
+  if (stopDistPrice / entry < 0.003) return;
 
   const closes = candles.map(c => c.close);
   const rsi = calcRSI(closes);
@@ -107,6 +112,33 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
      false, null, now],
   );
 
+  // Direction must align with the 1h trend — counter-trend trades lose 65%+ in live data
+  // Longs: 7W/17L (35%) | Shorts in downtrend: 14W/14L (50%)
+  if (htfRegime === 'strong_downtrend' || htfRegime === 'weak_downtrend') {
+    if (direction === 'long') {
+      await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
+        [`counter-trend long in ${htfRegime}`, signalId]);
+      await saveRlExperience(pool, {
+        signalId, tradeId: null, symbol, tf, best, direction,
+        regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
+        riskReward, entry, hourUtc, dayOfWeek, acted: false,
+      });
+      return;
+    }
+  }
+  if (htfRegime === 'strong_uptrend' || htfRegime === 'weak_uptrend') {
+    if (direction === 'short') {
+      await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
+        [`counter-trend short in ${htfRegime}`, signalId]);
+      await saveRlExperience(pool, {
+        signalId, tradeId: null, symbol, tf, best, direction,
+        regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
+        riskReward, entry, hourUtc, dayOfWeek, acted: false,
+      });
+      return;
+    }
+  }
+
   if (estimatedEdge < MIN_EDGE) {
     await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
       [`edge too low: ${estimatedEdge}`, signalId]);
@@ -133,14 +165,22 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   }
 
   const riskAmt = CAPITAL * RISK_PER_TRADE;
-  const stopDistPrice = Math.abs(entry - best.stopLoss);
   const size = stopDistPrice > 0 ? riskAmt / stopDistPrice : 0;
   if (size <= 0) return;
 
   const tp1 = direction === 'long'
     ? entry + (stopDistPrice * 1.5)
     : entry - (stopDistPrice * 1.5);
-  const tp2 = best.target;
+
+  // TP2 must be at least 2× stop distance from entry — pattern targets are sometimes
+  // at or below TP1 (observed: SOLUSDT tp1=100.305, tp2=100.31; DOTUSDT tp2 < tp1).
+  // When TP2 ≈ TP1 there is no room for the trailing-stop runner to work.
+  const tp2Min = direction === 'long'
+    ? entry + stopDistPrice * 2.0
+    : entry - stopDistPrice * 2.0;
+  const tp2 = direction === 'long'
+    ? Math.max(best.target, tp2Min)
+    : Math.min(best.target, tp2Min);
 
   const tradeId = uuidv4();
   await pool.query(

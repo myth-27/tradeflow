@@ -37,6 +37,18 @@ function connectBybit(tf: string): void {
   const ws = new WebSocket(BYBIT_WS);
   sockets.set(tf, ws);
 
+  // Bybit drops connections without a ping every 20s, and a half-open socket never emits
+  // 'close' — the engine logged zero signals Sep 11-26. Terminating forces the reconnect path.
+  let lastMessageAt = Date.now();
+  const heartbeat = setInterval(() => {
+    if (Date.now() - lastMessageAt > 90_000) {
+      console.warn(`[ws] no data for 90s tf=${tf} — forcing reconnect`);
+      ws.terminate();
+      return;
+    }
+    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ op: 'ping' }));
+  }, 20_000);
+
   ws.on('open', async () => {
     ws.send(JSON.stringify({ op: 'subscribe', args: topics }));
     console.log(`[ws] subscribed ${topics.length} Bybit kline.${interval} streams`);
@@ -48,6 +60,7 @@ function connectBybit(tf: string): void {
   });
 
   ws.on('message', (raw: Buffer) => {
+    lastMessageAt = Date.now();
     try {
       const msg = JSON.parse(raw.toString()) as {
         topic?: string;
@@ -87,6 +100,7 @@ function connectBybit(tf: string): void {
   });
 
   ws.on('close', () => {
+    clearInterval(heartbeat);
     console.log(`[ws] disconnected tf=${tf} — reconnecting in 5s`);
     sockets.delete(tf);
     const t = setTimeout(() => connectBybit(tf), 5000);

@@ -22,10 +22,11 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-// Edge < 70 lost money in both live periods (Sep 8-11: -$7.5k, Sep 26-27: -$30.6k)
-const MIN_EDGE = 70;
-// Correlated alt longs stopped out together; cap simultaneous exposure
-const MAX_OPEN_TRADES = 3;
+// Replay of all logged signals: trend-aligned edge>=60 kept the best risk-adjusted return;
+// 70 left only ~2 trades/week and edge alone was not predictive
+const MIN_EDGE = 60;
+// Replay: cap of 3 skipped too many winners (41R vs 52-95R); 5 bounds correlated exposure to 5%
+const MAX_OPEN_TRADES = 5;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
@@ -38,8 +39,10 @@ function getCooldownMs(tf: string): number {
   return tf === '5m' ? 15 * 60 * 1000 : 30 * 60 * 1000;
 }
 
-// Live results: Shooting Star 0W/5L, Hammer 0W/2L, Ascending Triangle 9W/27L (-$71.5k)
-const EXCLUDED_PATTERNS = new Set(['Shooting Star', 'Hammer', 'Ascending Triangle']);
+// Negative expectancy on trend-aligned signals in the Sep 8-11 replay; excluding them held up on Sep 26-27
+const EXCLUDED_PATTERNS = new Set([
+  'Ascending Triangle', 'Shooting Star', 'Hammer', 'Double Bottom', 'Morning Star',
+]);
 
 // 5m and 15m candles close together; serialize per symbol so both can't open a trade at once
 const symbolQueue = new Map<string, Promise<void>>();
@@ -69,10 +72,10 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   if (candles.length < MIN_CANDLES) return;
 
   const htfCandles = getCandles(symbol, '1h');
-  if (htfCandles.length >= 50) {
-    const htfRegime = classifyRegime(htfCandles);
-    if (htfRegime === 'ranging' || htfRegime === 'low_volatility') return;
-  }
+  if (htfCandles.length < 50) return;
+  const htfRegime = classifyRegime(htfCandles);
+  if (htfRegime === 'ranging' || htfRegime === 'low_volatility') return;
+  const htfUp = htfRegime === 'strong_uptrend' || htfRegime === 'weak_uptrend';
 
   const regime = classifyRegime(candles);
   const patterns = runAllPatterns(candles);
@@ -122,9 +125,11 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
      false, null, now],
   );
 
-  if (estimatedEdge < MIN_EDGE) {
+  // Replay of all logged signals: with 1h trend +75.6R, against it -14.8R
+  const counterTrend = (direction === 'long') !== htfUp;
+  if (counterTrend || estimatedEdge < MIN_EDGE) {
     await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
-      [`edge too low: ${estimatedEdge}`, signalId]);
+      [counterTrend ? `counter-trend ${direction} in ${htfRegime}` : `edge too low: ${estimatedEdge}`, signalId]);
 
     // Still record for RL (negative examples are equally valuable)
     await saveRlExperience(pool, {
@@ -161,16 +166,8 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   const tp1 = direction === 'long'
     ? entry + (stopDistPrice * 1.5)
     : entry - (stopDistPrice * 1.5);
-
-  // TP2 must be at least 2× stop distance from entry — pattern targets are sometimes
-  // at or below TP1 (observed: SOLUSDT tp1=100.305, tp2=100.31; DOTUSDT tp2 < tp1).
-  // When TP2 ≈ TP1 there is no room for the trailing-stop runner to work.
-  const tp2Min = direction === 'long'
-    ? entry + stopDistPrice * 2.0
-    : entry - stopDistPrice * 2.0;
-  const tp2 = direction === 'long'
-    ? Math.max(best.target, tp2Min)
-    : Math.min(best.target, tp2Min);
+  // Pattern target as-is: forcing TP2 >= 2R scored worse in replay (45.8R vs 52.2R)
+  const tp2 = best.target;
 
   const tradeId = uuidv4();
   await pool.query(

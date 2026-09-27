@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { runAllPatterns, calcRSI, calcVolumeProfile } from '@/lib/pattern-engine';
 import { classifyRegime } from '@/lib/simulator';
 import { quickEdgeEstimate } from '@/lib/edge-score';
-import { getPool, getState, setState } from './db';
+import { getPool, getState, incState } from './db';
 import { getCandles, getLivePrice } from './candle-store';
 
 const SYMBOLS = [
@@ -22,7 +22,10 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-const MIN_EDGE = 65;
+// Edge < 70 lost money in both live periods (Sep 8-11: -$7.5k, Sep 26-27: -$30.6k)
+const MIN_EDGE = 70;
+// Correlated alt longs stopped out together; cap simultaneous exposure
+const MAX_OPEN_TRADES = 3;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
@@ -35,11 +38,22 @@ function getCooldownMs(tf: string): number {
   return tf === '5m' ? 15 * 60 * 1000 : 30 * 60 * 1000;
 }
 
-// Single-candle reversal patterns: no confirmation context, 0W/7L in live data
-const EXCLUDED_PATTERNS = new Set(['Shooting Star', 'Hammer']);
+// Live results: Shooting Star 0W/5L, Hammer 0W/2L, Ascending Triangle 9W/27L (-$71.5k)
+const EXCLUDED_PATTERNS = new Set(['Shooting Star', 'Hammer', 'Ascending Triangle']);
 
-export async function processNewCandle(symbol: string, tf: string): Promise<void> {
-  if (!SIGNAL_TIMEFRAMES.has(tf)) return;
+// 5m and 15m candles close together; serialize per symbol so both can't open a trade at once
+const symbolQueue = new Map<string, Promise<void>>();
+
+export function processNewCandle(symbol: string, tf: string): Promise<void> {
+  if (!SIGNAL_TIMEFRAMES.has(tf)) return Promise.resolve();
+  const next = (symbolQueue.get(symbol) ?? Promise.resolve())
+    .then(() => evaluateCandle(symbol, tf))
+    .catch(err => console.error(`[signal] ${symbol} ${tf} error:`, err));
+  symbolQueue.set(symbol, next);
+  return next;
+}
+
+async function evaluateCandle(symbol: string, tf: string): Promise<void> {
 
   const state = await getState();
   if (state['halted'] === 'true') return;
@@ -54,11 +68,9 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   const candles = getCandles(symbol, tf);
   if (candles.length < MIN_CANDLES) return;
 
-  // HTF regime filter — hoist htfRegime so direction-alignment check can use it later
   const htfCandles = getCandles(symbol, '1h');
-  let htfRegime = '';
   if (htfCandles.length >= 50) {
-    htfRegime = classifyRegime(htfCandles);
+    const htfRegime = classifyRegime(htfCandles);
     if (htfRegime === 'ranging' || htfRegime === 'low_volatility') return;
   }
 
@@ -81,9 +93,7 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   if (direction === 'long' && (best.stopLoss >= entry || best.target <= entry)) return;
   if (direction === 'short' && (best.stopLoss <= entry || best.target >= entry)) return;
 
-  // Minimum stop distance: 0.3% of entry — tighter stops get hit by candle noise before price moves
   const stopDistPrice = Math.abs(entry - best.stopLoss);
-  if (stopDistPrice / entry < 0.003) return;
 
   const closes = candles.map(c => c.close);
   const rsi = calcRSI(closes);
@@ -112,33 +122,6 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
      false, null, now],
   );
 
-  // Direction must align with the 1h trend — counter-trend trades lose 65%+ in live data
-  // Longs: 7W/17L (35%) | Shorts in downtrend: 14W/14L (50%)
-  if (htfRegime === 'strong_downtrend' || htfRegime === 'weak_downtrend') {
-    if (direction === 'long') {
-      await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
-        [`counter-trend long in ${htfRegime}`, signalId]);
-      await saveRlExperience(pool, {
-        signalId, tradeId: null, symbol, tf, best, direction,
-        regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
-        riskReward, entry, hourUtc, dayOfWeek, acted: false,
-      });
-      return;
-    }
-  }
-  if (htfRegime === 'strong_uptrend' || htfRegime === 'weak_uptrend') {
-    if (direction === 'short') {
-      await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
-        [`counter-trend short in ${htfRegime}`, signalId]);
-      await saveRlExperience(pool, {
-        signalId, tradeId: null, symbol, tf, best, direction,
-        regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
-        riskReward, entry, hourUtc, dayOfWeek, acted: false,
-      });
-      return;
-    }
-  }
-
   if (estimatedEdge < MIN_EDGE) {
     await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
       [`edge too low: ${estimatedEdge}`, signalId]);
@@ -153,9 +136,17 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
   }
 
   const { rows: openTrades } = await pool.query(
-    `SELECT id FROM paper_trades WHERE symbol = $1 AND status = 'open'`, [symbol]);
-  if (openTrades.length > 0) {
-    await pool.query(`UPDATE signal_log SET reason = 'already in trade' WHERE id = $1`, [signalId]);
+    `SELECT symbol FROM paper_trades WHERE status = 'open'`);
+  const riskAmt = CAPITAL * RISK_PER_TRADE;
+  let skipReason: string | null = null;
+  if (openTrades.some((t: { symbol: string }) => t.symbol === symbol)) skipReason = 'already in trade';
+  else if (openTrades.length >= MAX_OPEN_TRADES) skipReason = `max open trades (${MAX_OPEN_TRADES})`;
+  // Daily limit counts open risk too, otherwise several trades opened just under the limit all lose
+  else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -(CAPITAL * MAX_DAILY_LOSS_PCT)) {
+    skipReason = 'daily loss limit incl. open risk';
+  }
+  if (skipReason) {
+    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, [skipReason, signalId]);
     await saveRlExperience(pool, {
       signalId, tradeId: null, symbol, tf, best, direction,
       regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
@@ -164,7 +155,6 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
     return;
   }
 
-  const riskAmt = CAPITAL * RISK_PER_TRADE;
   const size = stopDistPrice > 0 ? riskAmt / stopDistPrice : 0;
   if (size <= 0) return;
 
@@ -200,8 +190,7 @@ export async function processNewCandle(symbol: string, tf: string): Promise<void
     riskReward, entry, hourUtc, dayOfWeek, acted: true,
   });
 
-  const total = parseInt(state['total_trades'] ?? '0') + 1;
-  await setState('total_trades', String(total));
+  await incState('total_trades', 1);
 
   lastSignalTime.set(ck, now);
   console.log(`[signal] ${symbol} ${tf} ${direction} ${best.name} edge=${estimatedEdge} tier=${tier}`);

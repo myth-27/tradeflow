@@ -1,4 +1,4 @@
-import { getPool, getState, setState } from './db';
+import { getPool, getState, setState, incState } from './db';
 import { getLivePrice, getCandles } from './candle-store';
 
 function calcATR(symbol: string, tf: string, period = 14): number {
@@ -122,19 +122,10 @@ async function checkOpenTrades(): Promise<void> {
       [now, exitPrice, exitReason, pnlPct, pnlAbs, id],
     );
 
-    // Update system counters
-    const currentDailyPnl = parseFloat(state['daily_pnl'] ?? '0');
-    await setState('daily_pnl', String(currentDailyPnl + pnlAbs));
-
-    // Move capital with actual P&L so equity curve reflects real account value
-    const currentCapital = parseFloat(state['capital'] ?? '0');
-    await setState('capital', String(parseFloat((currentCapital + pnlAbs).toFixed(2))));
-
-    if (pnlPct > 0) {
-      await setState('wins', String(parseInt(state['wins'] ?? '0') + 1));
-    } else {
-      await setState('losses', String(parseInt(state['losses'] ?? '0') + 1));
-    }
+    // Atomic increments: several trades can close in one tick, and `state` is a stale snapshot
+    await incState('daily_pnl', pnlAbs);
+    await incState('capital', pnlAbs);
+    await incState(pnlPct > 0 ? 'wins' : 'losses', 1);
 
     // Update RL experience with outcome
     const barsHeld = Math.round((now - parseInt(opened_at)) / (15 * 60 * 1000));

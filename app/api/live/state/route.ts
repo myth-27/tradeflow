@@ -13,24 +13,27 @@ export async function GET() {
   try {
     await initDb(); // creates tables if they don't exist yet (idempotent)
     const pool = getPool();
-    const [state, openRes, closedRes, signalsRes] = await Promise.all([
+    const [state, openRes, closedRes, signalsRes, totalsRes] = await Promise.all([
       getState(),
       pool.query(`SELECT * FROM paper_trades WHERE status = 'open' ORDER BY opened_at DESC`),
       pool.query(
         `SELECT * FROM paper_trades WHERE status = 'closed' ORDER BY closed_at DESC LIMIT 200`,
       ),
       pool.query(`SELECT * FROM signal_log ORDER BY detected_at DESC LIMIT 50`),
+      pool.query(
+        `SELECT COALESCE(SUM(pnl_abs), 0)::float8 AS pnl,
+                COUNT(*) FILTER (WHERE pnl_pct > 0)::int AS wins,
+                COUNT(*) FILTER (WHERE pnl_pct <= 0)::int AS losses
+         FROM paper_trades WHERE status = 'closed'`,
+      ),
     ]);
 
-    const wins = parseInt(state['wins'] ?? '0');
-    const losses = parseInt(state['losses'] ?? '0');
+    // Derived from the trades table so counters can never drift from the actual trade history
+    const { pnl: totalPnlAbs, wins, losses } = totalsRes.rows[0] as { pnl: number; wins: number; losses: number };
     const completed = wins + losses;
-    const capital = parseFloat(state['capital'] ?? '10000');
 
-    // Cumulative P&L in dollars from closed trades
     const allClosed: Array<{ symbol: string; pnl_abs: number; pnl_pct: number; closed_at: number }> =
       closedRes.rows;
-    const totalPnlAbs = allClosed.reduce((s, t) => s + (t.pnl_abs ?? 0), 0);
 
     // Per-symbol breakdown
     const symbolStats: Record<string, { wins: number; losses: number; totalPnl: number; trades: number }> = {};
@@ -92,7 +95,8 @@ export async function GET() {
     }
 
     const startingCapital = parseFloat(process.env.STARTING_CAPITAL ?? '500000');
-    const currentEquity = parseFloat((capital + totalPnlAbs).toFixed(2));
+    const capital = parseFloat((startingCapital + totalPnlAbs).toFixed(2));
+    const currentEquity = capital;
 
     return NextResponse.json({
       halted: state['halted'] === 'true',

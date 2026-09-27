@@ -118,6 +118,14 @@ export async function getState(): Promise<Record<string, string>> {
   return Object.fromEntries(rows.map((r: { key: string; value: string }) => [r.key, r.value]));
 }
 
+export async function incState(key: string, delta: number): Promise<void> {
+  await getPool().query(
+    `INSERT INTO system_state (key, value) VALUES ($1, $2::text)
+     ON CONFLICT (key) DO UPDATE SET value = (system_state.value::double precision + $2)::text`,
+    [key, delta],
+  );
+}
+
 export async function setState(key: string, value: string): Promise<void> {
   await getPool().query(
     'INSERT INTO system_state (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',

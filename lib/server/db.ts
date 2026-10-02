@@ -120,8 +120,8 @@ export async function getState(): Promise<Record<string, string>> {
 
 export async function incState(key: string, delta: number): Promise<void> {
   await getPool().query(
-    `INSERT INTO system_state (key, value) VALUES ($1, $2::text)
-     ON CONFLICT (key) DO UPDATE SET value = (system_state.value::double precision + $2)::text`,
+    `INSERT INTO system_state (key, value) VALUES ($1, ($2::double precision)::text)
+     ON CONFLICT (key) DO UPDATE SET value = (system_state.value::double precision + $2::double precision)::text`,
     [key, delta],
   );
 }

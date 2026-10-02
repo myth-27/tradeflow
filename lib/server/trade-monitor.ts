@@ -1,18 +1,5 @@
 import { getPool, getState, setState, incState } from './db';
-import { getLivePrice, getCandles } from './candle-store';
-
-function calcATR(symbol: string, tf: string, period = 14): number {
-  const candles = getCandles(symbol, tf);
-  if (candles.length < period + 1) return 0;
-  const trs = candles.slice(1).map((c, i) => Math.max(
-    c.high - c.low,
-    Math.abs(c.high - candles[i].close),
-    Math.abs(c.low - candles[i].close),
-  ));
-  let atr = trs.slice(0, period).reduce((a, b) => a + b, 0) / period;
-  for (let i = period; i < trs.length; i++) atr = (atr * (period - 1) + trs[i]) / period;
-  return atr;
-}
+import { getLivePrice, calcATR } from './candle-store';
 
 let monitorInterval: ReturnType<typeof setInterval> | null = null;
 

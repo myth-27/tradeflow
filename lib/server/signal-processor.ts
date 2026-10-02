@@ -3,7 +3,7 @@ import { runAllPatterns, calcRSI, calcVolumeProfile } from '@/lib/pattern-engine
 import { classifyRegime } from '@/lib/simulator';
 import { quickEdgeEstimate } from '@/lib/edge-score';
 import { getPool, getState, incState } from './db';
-import { getCandles, getLivePrice } from './candle-store';
+import { getCandles, getLivePrice, calcATR } from './candle-store';
 
 const SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
@@ -31,6 +31,9 @@ const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
 const MAX_DAILY_LOSS_PCT = 0.03;
+// Trading rule: initial stop is the tighter of the pattern stop, 1.5x ATR, and 1% from entry
+const MAX_STOP_PCT = 0.01;
+const ATR_STOP_MULT = 1.5;
 
 const lastSignalTime = new Map<string, number>();
 
@@ -61,8 +64,11 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   const state = await getState();
   if (state['halted'] === 'true') return;
 
+  // Risk and the daily limit scale with current equity, not starting capital
+  const equity = parseFloat(state['capital'] ?? String(CAPITAL));
+  const dailyLossLimit = equity * MAX_DAILY_LOSS_PCT;
   const dailyPnl = parseFloat(state['daily_pnl'] ?? '0');
-  if (dailyPnl <= -(CAPITAL * MAX_DAILY_LOSS_PCT)) return;
+  if (dailyPnl <= -dailyLossLimit) return;
 
   const ck = `${symbol}:${tf}`;
   const lastFired = lastSignalTime.get(ck) ?? 0;
@@ -96,7 +102,15 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   if (direction === 'long' && (best.stopLoss >= entry || best.target <= entry)) return;
   if (direction === 'short' && (best.stopLoss <= entry || best.target >= entry)) return;
 
-  const stopDistPrice = Math.abs(entry - best.stopLoss);
+  const atr = calcATR(symbol, tf);
+  const stopCandidates = [
+    best.stopLoss,
+    direction === 'long' ? entry * (1 - MAX_STOP_PCT) : entry * (1 + MAX_STOP_PCT),
+    ...(atr > 0 ? [direction === 'long' ? entry - atr * ATR_STOP_MULT : entry + atr * ATR_STOP_MULT] : []),
+  ];
+  const stopLoss = direction === 'long' ? Math.max(...stopCandidates) : Math.min(...stopCandidates);
+  const plan = { ...best, stopLoss };
+  const stopDistPrice = Math.abs(entry - stopLoss);
 
   const closes = candles.map(c => c.close);
   const rsi = calcRSI(closes);
@@ -105,7 +119,7 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
     best.confidence, regime, direction, volProfile.volumeRatio, rsi,
   );
 
-  const riskReward = Math.abs(best.target - entry) / Math.abs(entry - best.stopLoss);
+  const riskReward = Math.abs(best.target - entry) / stopDistPrice;
   const now = Date.now();
   const dt = new Date(now);
   const hourUtc = dt.getUTCHours();
@@ -114,6 +128,7 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   const signalId = uuidv4();
   const pool = getPool();
 
+  // signal_log keeps the raw pattern stop so replays can test other stop rules
   await pool.query(
     `INSERT INTO signal_log
      (id, symbol, timeframe, pattern, direction, confidence, edge_score, tier, regime,
@@ -133,7 +148,7 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
 
     // Still record for RL (negative examples are equally valuable)
     await saveRlExperience(pool, {
-      signalId, tradeId: null, symbol, tf, best, direction,
+      signalId, tradeId: null, symbol, tf, best: plan, direction,
       regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
       riskReward, entry, hourUtc, dayOfWeek, acted: false,
     });
@@ -142,18 +157,18 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
 
   const { rows: openTrades } = await pool.query(
     `SELECT symbol FROM paper_trades WHERE status = 'open'`);
-  const riskAmt = CAPITAL * RISK_PER_TRADE;
+  const riskAmt = equity * RISK_PER_TRADE;
   let skipReason: string | null = null;
   if (openTrades.some((t: { symbol: string }) => t.symbol === symbol)) skipReason = 'already in trade';
   else if (openTrades.length >= MAX_OPEN_TRADES) skipReason = `max open trades (${MAX_OPEN_TRADES})`;
   // Daily limit counts open risk too, otherwise several trades opened just under the limit all lose
-  else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -(CAPITAL * MAX_DAILY_LOSS_PCT)) {
+  else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -dailyLossLimit) {
     skipReason = 'daily loss limit incl. open risk';
   }
   if (skipReason) {
     await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, [skipReason, signalId]);
     await saveRlExperience(pool, {
-      signalId, tradeId: null, symbol, tf, best, direction,
+      signalId, tradeId: null, symbol, tf, best: plan, direction,
       regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
       riskReward, entry, hourUtc, dayOfWeek, acted: false,
     });
@@ -175,14 +190,14 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
      (id, symbol, timeframe, direction, entry, stop_loss, tp1, tp2, size,
       pattern, edge_score, tier, opened_at, status)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'open')`,
-    [tradeId, symbol, tf, direction, entry, best.stopLoss, tp1, tp2, size,
+    [tradeId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
      best.name, estimatedEdge, tier, now],
   );
 
   await pool.query(`UPDATE signal_log SET acted = true WHERE id = $1`, [signalId]);
 
   await saveRlExperience(pool, {
-    signalId, tradeId, symbol, tf, best, direction,
+    signalId, tradeId, symbol, tf, best: plan, direction,
     regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
     riskReward, entry, hourUtc, dayOfWeek, acted: true,
   });

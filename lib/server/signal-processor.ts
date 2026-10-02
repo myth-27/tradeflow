@@ -22,11 +22,12 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-// Replay of all logged signals: trend-aligned edge>=60 kept the best risk-adjusted return;
-// 70 left only ~2 trades/week and edge alone was not predictive
-const MIN_EDGE = 60;
-// Replay: cap of 3 skipped too many winners (41R vs 52-95R); 5 bounds correlated exposure to 5%
-const MAX_OPEN_TRADES = 5;
+// Replay over 4 separate periods (Sep 8-9, 10-11, 26-29, Sep 30-Oct 2): only these setups were
+// positive in every period. Longs lost in 3 of 4; the edge score and 1h trend filter both hurt
+// (edge>=60 cut +122R to +9R), so neither gates trades any more.
+const ALLOWED_SETUPS = new Set(['Head & Shoulders|short', 'Bearish Engulfing|short']);
+// Replay: 4 kept +165R with 30R max drawdown; 5 added little return for more drawdown
+const MAX_OPEN_TRADES = 4;
 const MIN_RR = 1.5;
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
 const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
@@ -42,7 +43,7 @@ function getCooldownMs(tf: string): number {
   return tf === '5m' ? 15 * 60 * 1000 : 30 * 60 * 1000;
 }
 
-// Negative expectancy on trend-aligned signals in the Sep 8-11 replay; excluding them held up on Sep 26-27
+// Kept out of best-pattern selection so the logged signal stream stays comparable with replay data
 const EXCLUDED_PATTERNS = new Set([
   'Ascending Triangle', 'Shooting Star', 'Hammer', 'Double Bottom', 'Morning Star',
 ]);
@@ -81,7 +82,6 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   if (htfCandles.length < 50) return;
   const htfRegime = classifyRegime(htfCandles);
   if (htfRegime === 'ranging' || htfRegime === 'low_volatility') return;
-  const htfUp = htfRegime === 'strong_uptrend' || htfRegime === 'weak_uptrend';
 
   const regime = classifyRegime(candles);
   const patterns = runAllPatterns(candles);
@@ -140,11 +140,9 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
      false, null, now],
   );
 
-  // Replay of all logged signals: with 1h trend +75.6R, against it -14.8R
-  const counterTrend = (direction === 'long') !== htfUp;
-  if (counterTrend || estimatedEdge < MIN_EDGE) {
+  if (!ALLOWED_SETUPS.has(`${best.name}|${direction}`)) {
     await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
-      [counterTrend ? `counter-trend ${direction} in ${htfRegime}` : `edge too low: ${estimatedEdge}`, signalId]);
+      [`setup not allowed: ${best.name} ${direction}`, signalId]);
 
     // Still record for RL (negative examples are equally valuable)
     await saveRlExperience(pool, {

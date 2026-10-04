@@ -5,7 +5,7 @@ import { quickEdgeEstimate } from '@/lib/edge-score';
 import { getPool, getState, incState } from './db';
 import { enforceDrawdownHalt } from './risk';
 import { getCandles, getLivePrice } from './candle-store';
-import { MIN_STOP_PCT, netRiskReward } from './costs';
+import { MAKER_FEE, MIN_STOP_PCT, STOP_SLIPPAGE, TAKER_FEE, netRiskReward } from './costs';
 
 const SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
@@ -39,20 +39,45 @@ const MIN_CANDLES = 50;
 const TRADING_MODE: 'log_only' | 'paper' = process.env.TRADING_MODE === 'paper' ? 'paper' : 'log_only';
 
 /**
- * Setups allowed to paper-trade, as "Pattern|direction", comma-separated, e.g.
- * "Bearish Engulfing|short". Empty by default: nothing has passed validation.
- * A setup belongs here only after its shadow trades beat random-direction entries
- * with identical exits, net of costs, at t >= 3 over at least 300 trades.
+ * Setups that have passed validation, as "Pattern|direction". A setup belongs here
+ * only after its shadow trades beat random-direction entries with identical exits,
+ * net of costs, at t >= 3 over at least 300 trades — and it gets here through a
+ * reviewed code change with a PLAN_HISTORY entry, never through a deploy variable.
+ * Empty: nothing has passed.
+ */
+const VALIDATED_SETUPS = new Set<string>([]);
+
+/**
+ * The ALLOWED_SETUPS env var can only NARROW the validated list (e.g. pause one
+ * setup). Anything it names that isn't validated is ignored.
  */
 const ALLOWED_SETUPS = new Set(
-  (process.env.ALLOWED_SETUPS ?? '').split(',').map(s => s.trim()).filter(Boolean),
+  (process.env.ALLOWED_SETUPS ?? Array.from(VALIDATED_SETUPS).join(','))
+    .split(',').map(s => s.trim()).filter(s => s && VALIDATED_SETUPS.has(s)),
 );
 
 const MAX_OPEN_TRADES = 2;            // crypto majors move together; 4 shorts were one bet
 const MIN_RR = 1.5;                   // measured on the actual stop, net of costs
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
-const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.0025');
+/** 0.25% of equity per trade (decided 2026-10-04). The env var may lower it, never raise it. */
+const MAX_RISK_PER_TRADE = 0.0025;
+const RISK_PER_TRADE = (() => {
+  const n = Number(process.env.RISK_PER_TRADE);
+  if (!Number.isFinite(n) || n <= 0) return MAX_RISK_PER_TRADE;
+  if (n > MAX_RISK_PER_TRADE) {
+    console.warn(`[config] RISK_PER_TRADE=${n} exceeds the reviewed cap ${MAX_RISK_PER_TRADE}; using ${MAX_RISK_PER_TRADE}`);
+    return MAX_RISK_PER_TRADE;
+  }
+  return n;
+})();
 const MAX_DAILY_LOSS_PCT = 0.03;
+
+// Effective configuration, logged once at startup so a deploy's behaviour is visible in its logs
+console.log(
+  `[config] mode=${TRADING_MODE} allowedSetups=[${Array.from(ALLOWED_SETUPS).join(', ')}] ` +
+  `risk=${RISK_PER_TRADE} maxOpen=${MAX_OPEN_TRADES} minNetRR=${MIN_RR} dailyLoss=${MAX_DAILY_LOSS_PCT} ` +
+  `minStop=${MIN_STOP_PCT} taker=${TAKER_FEE} maker=${MAKER_FEE} stopSlip=${STOP_SLIPPAGE}`,
+);
 
 const lastSignalTime = new Map<string, number>();
 

@@ -6,6 +6,24 @@ here in the same commit.
 
 ---
 
+## 2026-10-04 (follow-up) — Deploy variables can only tighten the engine
+
+Raised by the ship-reviewer on the log-only push: Railway variables could set
+fees to 0, lower the stop floor, raise risk (the July setup put
+`RISK_PER_TRADE` in Railway's variables) or enable setups, all without review.
+
+**Decision (Nitin):** guard the overrides. Env vars may make the engine more
+conservative, never less:
+
+- `TAKER_FEE`, `MAKER_FEE`, `STOP_SLIPPAGE`, `MIN_STOP_PCT` — values below the
+  reviewed defaults are ignored (with a warning); higher values are honoured.
+- `RISK_PER_TRADE` — capped at 0.25%; lower values are honoured.
+- `ALLOWED_SETUPS` — can only narrow `VALIDATED_SETUPS` in
+  `lib/server/signal-processor.ts` (empty). Adding a setup is a code change.
+- The effective config is logged once at startup (`[config] …`).
+
+---
+
 ## 2026-10-04 — Re-examination: no edge net of costs → log-only
 
 **What was found** (153 paper trades, 8 Sep–4 Oct; 11,540 logged signals →

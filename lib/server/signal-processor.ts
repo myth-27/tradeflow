@@ -3,7 +3,9 @@ import { runAllPatterns, calcRSI, calcVolumeProfile } from '@/lib/pattern-engine
 import { classifyRegime } from '@/lib/simulator';
 import { quickEdgeEstimate } from '@/lib/edge-score';
 import { getPool, getState, incState } from './db';
-import { getCandles, getLivePrice, calcATR } from './candle-store';
+import { enforceDrawdownHalt } from './risk';
+import { getCandles, getLivePrice } from './candle-store';
+import { MIN_STOP_PCT, netRiskReward } from './costs';
 
 const SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
@@ -22,19 +24,35 @@ export const STREAMS: Array<{ symbol: string; tf: string }> = [
 const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 
 const MIN_CANDLES = 50;
-// Replay over 4 separate periods (Sep 8-9, 10-11, 26-29, Sep 30-Oct 2): only these setups were
-// positive in every period. Longs lost in 3 of 4; the edge score and 1h trend filter both hurt
-// (edge>=60 cut +122R to +9R), so neither gates trades any more.
-const ALLOWED_SETUPS = new Set(['Head & Shoulders|short', 'Bearish Engulfing|short']);
-// Replay: 4 kept +165R with 30R max drawdown; 5 added little return for more drawdown
-const MAX_OPEN_TRADES = 4;
-const MIN_RR = 1.5;
+
+/**
+ * 'log_only' (default): no paper trades. Every setup that passes the stop and
+ * R:R rules is followed as a shadow trade so its net-of-cost result is recorded.
+ * 'paper': open paper trades, but ONLY for setups listed in ALLOWED_SETUPS.
+ *
+ * Why log-only: a cost-aware replay of all 11,540 logged signals (8 Sep – 4 Oct)
+ * found no setup with positive expectancy net of fees. Gross expectancy was
+ * -0.05R/trade and random-direction entries with identical exits did no worse.
+ * The two setups traded since 2 Oct were reliably negative under the old stop
+ * rule (t = -2.9 and -4.9). Setups must earn their way back with shadow evidence.
+ */
+const TRADING_MODE: 'log_only' | 'paper' = process.env.TRADING_MODE === 'paper' ? 'paper' : 'log_only';
+
+/**
+ * Setups allowed to paper-trade, as "Pattern|direction", comma-separated, e.g.
+ * "Bearish Engulfing|short". Empty by default: nothing has passed validation.
+ * A setup belongs here only after its shadow trades beat random-direction entries
+ * with identical exits, net of costs, at t >= 3 over at least 300 trades.
+ */
+const ALLOWED_SETUPS = new Set(
+  (process.env.ALLOWED_SETUPS ?? '').split(',').map(s => s.trim()).filter(Boolean),
+);
+
+const MAX_OPEN_TRADES = 2;            // crypto majors move together; 4 shorts were one bet
+const MIN_RR = 1.5;                   // measured on the actual stop, net of costs
 const CAPITAL = parseFloat(process.env.STARTING_CAPITAL ?? '10000');
-const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.01');
+const RISK_PER_TRADE = parseFloat(process.env.RISK_PER_TRADE ?? '0.0025');
 const MAX_DAILY_LOSS_PCT = 0.03;
-// Trading rule: initial stop is the tighter of the pattern stop, 1.5x ATR, and 1% from entry
-const MAX_STOP_PCT = 0.01;
-const ATR_STOP_MULT = 1.5;
 
 const lastSignalTime = new Map<string, number>();
 
@@ -64,12 +82,12 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
 
   const state = await getState();
   if (state['halted'] === 'true') return;
-
   // Risk and the daily limit scale with current equity, not starting capital
   const equity = parseFloat(state['capital'] ?? String(CAPITAL));
+  if (TRADING_MODE === 'paper' && await enforceDrawdownHalt(state, equity)) return;
   const dailyLossLimit = equity * MAX_DAILY_LOSS_PCT;
   const dailyPnl = parseFloat(state['daily_pnl'] ?? '0');
-  if (dailyPnl <= -dailyLossLimit) return;
+  if (TRADING_MODE === 'paper' && dailyPnl <= -dailyLossLimit) return;
 
   const ck = `${symbol}:${tf}`;
   const lastFired = lastSignalTime.get(ck) ?? 0;
@@ -91,10 +109,7 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
     .filter(p => p.type !== 'neutral' && !p.conflicting && !EXCLUDED_PATTERNS.has(p.name))
     .sort((a, b) => b.confidence - a.confidence)[0];
   if (!best) return;
-
   if (!best.stopLoss || !best.target) return;
-  const stopDist = Math.abs(best.support - best.stopLoss);
-  if (stopDist <= 0 || best.riskReward < MIN_RR) return;
 
   const entry = getLivePrice(symbol) ?? candles[candles.length - 1].close;
   const direction: 'long' | 'short' = best.type === 'bullish' ? 'long' : 'short';
@@ -102,15 +117,12 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   if (direction === 'long' && (best.stopLoss >= entry || best.target <= entry)) return;
   if (direction === 'short' && (best.stopLoss <= entry || best.target >= entry)) return;
 
-  const atr = calcATR(symbol, tf);
-  const stopCandidates = [
-    best.stopLoss,
-    direction === 'long' ? entry * (1 - MAX_STOP_PCT) : entry * (1 + MAX_STOP_PCT),
-    ...(atr > 0 ? [direction === 'long' ? entry - atr * ATR_STOP_MULT : entry + atr * ATR_STOP_MULT] : []),
-  ];
-  const stopLoss = direction === 'long' ? Math.max(...stopCandidates) : Math.min(...stopCandidates);
-  const plan = { ...best, stopLoss };
+  // The pattern's own invalidation level is the stop. The previous rule took the
+  // TIGHTEST of pattern stop, 1.5x ATR and 1%, which put the median stop at 1.5 ATR on
+  // 5m bars: 40% of stop-outs came within 15 minutes and costs averaged 0.60R/trade.
+  const stopLoss = best.stopLoss;
   const stopDistPrice = Math.abs(entry - stopLoss);
+  const riskReward = netRiskReward(entry, stopLoss, best.target);
 
   const closes = candles.map(c => c.close);
   const rsi = calcRSI(closes);
@@ -119,16 +131,17 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
     best.confidence, regime, direction, volProfile.volumeRatio, rsi,
   );
 
-  const riskReward = Math.abs(best.target - entry) / stopDistPrice;
   const now = Date.now();
   const dt = new Date(now);
   const hourUtc = dt.getUTCHours();
   const dayOfWeek = dt.getUTCDay();
+  const setup = `${best.name}|${direction}`;
 
   const signalId = uuidv4();
   const pool = getPool();
 
-  // signal_log keeps the raw pattern stop so replays can test other stop rules
+  // Every detected setup is logged — including ones the rules below reject — so the
+  // signal stream stays complete for replays. risk_reward is net of costs.
   await pool.query(
     `INSERT INTO signal_log
      (id, symbol, timeframe, pattern, direction, confidence, edge_score, tier, regime,
@@ -136,26 +149,65 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
     [signalId, symbol, tf, best.name, direction,
      best.confidence, estimatedEdge, tier, regime,
-     entry, best.stopLoss, best.target, riskReward,
+     entry, stopLoss, best.target, riskReward,
      false, null, now],
   );
 
-  if (!ALLOWED_SETUPS.has(`${best.name}|${direction}`)) {
-    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`,
-      [`setup not allowed: ${best.name} ${direction}`, signalId]);
+  const rl = (tradeId: string | null, acted: boolean) => saveRlExperience(pool, {
+    signalId, tradeId, symbol, tf, best: { ...best, stopLoss }, direction,
+    regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
+    riskReward, entry, hourUtc, dayOfWeek, acted,
+  });
+  const reject = async (reason: string) => {
+    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, [reason, signalId]);
+    await rl(null, false);
+  };
 
-    // Still record for RL (negative examples are equally valuable)
-    await saveRlExperience(pool, {
-      signalId, tradeId: null, symbol, tf, best: plan, direction,
-      regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
-      riskReward, entry, hourUtc, dayOfWeek, acted: false,
-    });
+  // Rules that apply in every mode: a trade we would never take is not worth shadowing.
+  if (stopDistPrice < entry * MIN_STOP_PCT) {
+    return reject(`stop ${(100 * stopDistPrice / entry).toFixed(2)}% < ${(100 * MIN_STOP_PCT).toFixed(1)}% floor`);
+  }
+  if (riskReward < MIN_RR) {
+    return reject(`net R:R ${riskReward.toFixed(2)} < ${MIN_RR}`);
+  }
+
+  const riskAmt = equity * RISK_PER_TRADE;
+  const size = riskAmt / stopDistPrice;
+  if (!(size > 0)) return;
+
+  // TP1 at 1.5R takes half off and moves the stop to breakeven; TP2 is the pattern target
+  const tp1 = direction === 'long' ? entry + stopDistPrice * 1.5 : entry - stopDistPrice * 1.5;
+  const tp2 = best.target;
+
+  if (TRADING_MODE === 'log_only') {
+    // One open shadow per setup per symbol/timeframe; no capital, no position limits
+    const { rows } = await pool.query(
+      `SELECT 1 FROM shadow_trades
+       WHERE status = 'open' AND symbol = $1 AND timeframe = $2 AND pattern = $3 AND direction = $4`,
+      [symbol, tf, best.name, direction]);
+    if (rows.length) return reject('log-only: same setup already being shadowed');
+
+    const shadowId = uuidv4();
+    await pool.query(
+      `INSERT INTO shadow_trades
+       (id, signal_id, symbol, timeframe, direction, entry, stop_loss, tp1, tp2, size,
+        pattern, edge_score, tier, opened_at, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'open')`,
+      [shadowId, signalId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
+       best.name, estimatedEdge, tier, now],
+    );
+    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, ['log-only: shadowed', signalId]);
+    await rl(null, false);
+    lastSignalTime.set(ck, now);
+    console.log(`[signal] shadow ${symbol} ${tf} ${direction} ${best.name} netRR=${riskReward.toFixed(2)}`);
     return;
   }
 
+  // --- paper mode ---
+  if (!ALLOWED_SETUPS.has(setup)) return reject(`setup not validated: ${best.name} ${direction}`);
+
   const { rows: openTrades } = await pool.query(
     `SELECT symbol FROM paper_trades WHERE status = 'open'`);
-  const riskAmt = equity * RISK_PER_TRADE;
   let skipReason: string | null = null;
   if (openTrades.some((t: { symbol: string }) => t.symbol === symbol)) skipReason = 'already in trade';
   else if (openTrades.length >= MAX_OPEN_TRADES) skipReason = `max open trades (${MAX_OPEN_TRADES})`;
@@ -163,24 +215,7 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -dailyLossLimit) {
     skipReason = 'daily loss limit incl. open risk';
   }
-  if (skipReason) {
-    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, [skipReason, signalId]);
-    await saveRlExperience(pool, {
-      signalId, tradeId: null, symbol, tf, best: plan, direction,
-      regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
-      riskReward, entry, hourUtc, dayOfWeek, acted: false,
-    });
-    return;
-  }
-
-  const size = stopDistPrice > 0 ? riskAmt / stopDistPrice : 0;
-  if (size <= 0) return;
-
-  const tp1 = direction === 'long'
-    ? entry + (stopDistPrice * 1.5)
-    : entry - (stopDistPrice * 1.5);
-  // Pattern target as-is: forcing TP2 >= 2R scored worse in replay (45.8R vs 52.2R)
-  const tp2 = best.target;
+  if (skipReason) return reject(skipReason);
 
   const tradeId = uuidv4();
   await pool.query(
@@ -193,17 +228,11 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   );
 
   await pool.query(`UPDATE signal_log SET acted = true WHERE id = $1`, [signalId]);
-
-  await saveRlExperience(pool, {
-    signalId, tradeId, symbol, tf, best: plan, direction,
-    regime, estimatedEdge, tier, rsi, volumeRatio: volProfile.volumeRatio,
-    riskReward, entry, hourUtc, dayOfWeek, acted: true,
-  });
-
+  await rl(tradeId, true);
   await incState('total_trades', 1);
 
   lastSignalTime.set(ck, now);
-  console.log(`[signal] ${symbol} ${tf} ${direction} ${best.name} edge=${estimatedEdge} tier=${tier}`);
+  console.log(`[signal] ${symbol} ${tf} ${direction} ${best.name} netRR=${riskReward.toFixed(2)} edge=${estimatedEdge}`);
 }
 
 async function saveRlExperience(pool: ReturnType<typeof getPool>, p: {

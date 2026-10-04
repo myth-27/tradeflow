@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Pre-push ship review for TradeFlow.
+#
+# A push to master deploys the live engine (Railway) and dashboard (Vercel), so
+# every push is gated twice:
+#   1. TypeScript must compile.
+#   2. The ship-reviewer agent (.claude/agents/ship-reviewer.md) reviews the
+#      commits against docs/PLAN_HISTORY.md and must end with "VERDICT: PASS".
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+# The full review is saved to .git/ship-review/last.md.
+set -u
+
+ZERO=0000000000000000000000000000000000000000
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+ranges=()
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue                 # branch deletion: nothing to review
+  if [ "$remote_sha" = "$ZERO" ]; then
+    # New remote branch: review everything not already on origin/master
+    base="$(git merge-base "$local_sha" origin/master 2>/dev/null || true)"
+    if [ -n "$base" ]; then ranges+=("$base..$local_sha"); else ranges+=("$local_sha"); fi
+  else
+    ranges+=("$remote_sha..$local_sha")
+  fi
+done
+
+[ ${#ranges[@]} -eq 0 ] && exit 0
+
+echo "[ship-review] typecheck…"
+if ! npx tsc --noEmit; then
+  echo "[ship-review] BLOCKED: TypeScript errors. Fix them before pushing."
+  exit 1
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "[ship-review] BLOCKED: the 'claude' CLI is not on PATH, so the review agent cannot run."
+  echo "              Install it with: npm install -g @anthropic-ai/claude-code"
+  exit 1
+fi
+
+mkdir -p .git/ship-review
+out=".git/ship-review/last.md"
+: > "$out"
+
+for range in "${ranges[@]}"; do
+  echo "[ship-review] reviewing $range with the ship-reviewer agent (this takes a few minutes)…"
+  claude -p "Review the commits in range $range for shipping to master. Follow your instructions exactly and end with the VERDICT line." \
+    --agent ship-reviewer \
+    --allowedTools "Read" "Grep" "Glob" "Bash(git log:*)" "Bash(git diff:*)" "Bash(git show:*)" \
+    --disallowedTools "Edit" "Write" "NotebookEdit" \
+    >> "$out" 2>&1
+  status=$?
+  echo "" >> "$out"
+
+  if [ $status -ne 0 ]; then
+    echo "[ship-review] BLOCKED: the review agent failed to run (exit $status). See $out"
+    exit 1
+  fi
+done
+
+cat "$out"
+
+# Every range's review must end in PASS; any FAIL (or a missing verdict) blocks.
+verdicts="$(grep -E '^VERDICT: (PASS|FAIL)\s*$' "$out")"
+if [ -z "$verdicts" ]; then
+  echo "[ship-review] BLOCKED: no VERDICT line in the review. See $out"
+  exit 1
+fi
+if echo "$verdicts" | grep -q 'FAIL'; then
+  echo "[ship-review] BLOCKED: review failed. Fix the blocking items above and push again."
+  exit 1
+fi
+passes="$(echo "$verdicts" | grep -c 'PASS')"
+if [ "$passes" -lt ${#ranges[@]} ]; then
+  echo "[ship-review] BLOCKED: only $passes of ${#ranges[@]} reviews returned a verdict. See $out"
+  exit 1
+fi
+
+echo "[ship-review] PASS — pushing."
+exit 0

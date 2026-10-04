@@ -56,3 +56,6 @@ training-exports/
 
 # Local data backups
 data/
+
+# replay inputs (signal dumps, candles) — large, regenerable
+research/replay/data/

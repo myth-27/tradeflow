@@ -23,7 +23,7 @@ export async function GET() {
       pool.query(
         `SELECT COALESCE(SUM(pnl_abs), 0)::float8 AS pnl,
                 COUNT(*) FILTER (WHERE pnl_pct > 0)::int AS wins,
-                COUNT(*) FILTER (WHERE pnl_pct <= 0)::int AS losses
+                COUNT(*) FILTER (WHERE pnl_pct < 0)::int AS losses
          FROM paper_trades WHERE status = 'closed'`,
       ),
     ]);

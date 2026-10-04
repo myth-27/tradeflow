@@ -110,6 +110,40 @@ export async function initDb(): Promise<void> {
     -- Add columns that might be missing from earlier schema versions
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS tp1_hit BOOLEAN NOT NULL DEFAULT false;
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS pnl_abs DOUBLE PRECISION;
+    -- Fees charged on the trade. pnl_abs/pnl_pct are NET of these from 2026-10-04 on;
+    -- trades closed before that (fees_abs IS NULL) were recorded gross.
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS fees_abs DOUBLE PRECISION;
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS r_multiple DOUBLE PRECISION;
+
+    -- Log-only mode: every tradeable setup is followed with the same exit rules and
+    -- costs as a paper trade, but nothing here touches capital, wins or daily P&L.
+    -- This is the evidence a setup must pass before it is allowed to paper-trade.
+    CREATE TABLE IF NOT EXISTS shadow_trades (
+      id          TEXT PRIMARY KEY,
+      signal_id   TEXT NOT NULL,
+      symbol      TEXT NOT NULL,
+      timeframe   TEXT NOT NULL,
+      direction   TEXT NOT NULL,
+      entry       DOUBLE PRECISION NOT NULL,
+      stop_loss   DOUBLE PRECISION NOT NULL,
+      tp1         DOUBLE PRECISION NOT NULL,
+      tp2         DOUBLE PRECISION NOT NULL,
+      tp1_hit     BOOLEAN NOT NULL DEFAULT false,
+      size        DOUBLE PRECISION NOT NULL,
+      pattern     TEXT NOT NULL,
+      edge_score  DOUBLE PRECISION NOT NULL,
+      tier        TEXT NOT NULL,
+      opened_at   BIGINT NOT NULL,
+      closed_at   BIGINT,
+      exit_price  DOUBLE PRECISION,
+      exit_reason TEXT,
+      pnl_pct     DOUBLE PRECISION,
+      pnl_abs     DOUBLE PRECISION,
+      fees_abs    DOUBLE PRECISION,
+      r_multiple  DOUBLE PRECISION,
+      status      TEXT NOT NULL DEFAULT 'open'
+    );
+    CREATE INDEX IF NOT EXISTS shadow_trades_status ON shadow_trades (status);
   `);
 }
 

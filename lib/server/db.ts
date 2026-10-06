@@ -144,6 +144,27 @@ export async function initDb(): Promise<void> {
       status      TEXT NOT NULL DEFAULT 'open'
     );
     CREATE INDEX IF NOT EXISTS shadow_trades_status ON shadow_trades (status);
+
+    -- Where an rl_experience outcome came from: 'paper' (a real paper trade) or
+    -- 'shadow' (log-only follow-through). Kept separate so training data never mixes
+    -- them without knowing. Rows with no outcome were never followed through.
+    ALTER TABLE rl_experience ADD COLUMN IF NOT EXISTS outcome_source TEXT;
+    CREATE INDEX IF NOT EXISTS rl_experience_signal ON rl_experience (signal_id);
+    UPDATE rl_experience SET outcome_source = 'paper'
+     WHERE outcome IS NOT NULL AND outcome_source IS NULL AND trade_id IS NOT NULL;
+
+    -- Backfill: shadow trades that closed before outcomes were written back
+    -- (2026-10-04 → 06). Idempotent — only fills rows that are still unlabelled.
+    UPDATE rl_experience r
+       SET reward = s.pnl_pct,
+           outcome = CASE WHEN s.pnl_abs > 0 THEN 'win' WHEN s.pnl_abs < 0 THEN 'loss' ELSE 'breakeven' END,
+           bars_held = ROUND((s.closed_at - s.opened_at)::numeric
+                             / (CASE s.timeframe WHEN '5m' THEN 5 WHEN '15m' THEN 15 ELSE 60 END * 60000))::int,
+           exit_reason = s.exit_reason,
+           updated_at = s.closed_at,
+           outcome_source = 'shadow'
+      FROM shadow_trades s
+     WHERE s.status = 'closed' AND r.signal_id = s.signal_id AND r.outcome IS NULL;
   `);
 }
 

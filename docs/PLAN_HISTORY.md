@@ -6,6 +6,30 @@ here in the same commit.
 
 ---
 
+## 2026-10-06 — RL data: label shadow outcomes
+
+**Goal (Nitin):** collect good data for reinforcement learning and, from it, a
+profitable algorithm. **Modelling plan:** supervised meta-labeling first
+(predict net R per signal, validated walk-forward against the random-entry
+baseline); RL only if that shows real signal.
+
+**Problem:** `rl_experience` had 16,908 rows but only 92 outcomes (0.5%). Only
+*paper* trades wrote outcomes back, so every log-only shadow trade produced an
+unlabelled row, and the labelled set held only trades the engine chose to take
+— a selection-biased sample.
+
+**Change:** shadow trades now write their outcome to the signal's
+`rl_experience` row (joined on `signal_id`). New column `outcome_source`
+(`paper` | `shadow`) keeps the two apart. `initDb` backfills shadow trades that
+closed before this change (15 on 2026-10-06), idempotently. `reward` remains
+percent P&L net of costs; R-multiples are on `shadow_trades.r_multiple`.
+
+**Still unlabelled by design:** signals rejected by the stop floor or net R:R
+(~95% of signals). Labelling those needs offline counterfactual outcomes from
+candles — a candidate next step, not yet decided.
+
+---
+
 ## 2026-10-04 (follow-up) — Deploy variables can only tighten the engine
 
 Raised by the ship-reviewer on the log-only push: Railway variables could set

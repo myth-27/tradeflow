@@ -24,6 +24,8 @@ interface OpenTrade {
   id: string; symbol: string; timeframe: string; direction: 'long' | 'short';
   entry: number; stop_loss: number; tp1: number; tp2: number; size: number;
   tp1_hit: boolean; opened_at: string;
+  /** shadow_trades only — links the outcome back to the signal's rl_experience row */
+  signal_id?: string;
 }
 
 /**
@@ -121,7 +123,19 @@ async function monitorTable(table: 'paper_trades' | 'shadow_trades', state: Reco
       [now, exitPrice, exitReason, pnlPct, pnlAbs, fees, r, id],
     );
 
+    // Label the signal's rl_experience row with the outcome. Both paper and shadow
+    // trades share their signal_id with that row; outcome_source keeps them apart.
+    // reward stays percent P&L (now net of costs) so the column keeps one unit across history.
+    const tfMin = TF_MINUTES[trade.timeframe] ?? 15;
+    const barsHeld = Math.round((now - parseInt(trade.opened_at)) / (tfMin * 60 * 1000));
+    const outcome = pnlAbs > 0 ? 'win' : pnlAbs < 0 ? 'loss' : 'breakeven';
     if (table === 'shadow_trades') {
+      await pool.query(
+        `UPDATE rl_experience
+         SET reward = $1, outcome = $2, bars_held = $3, exit_reason = $4, updated_at = $5, outcome_source = 'shadow'
+         WHERE signal_id = $6 AND outcome IS NULL`,
+        [pnlPct, outcome, barsHeld, exitReason, now, trade.signal_id],
+      );
       console.log(`[monitor] shadow ${trade.symbol} ${exitReason} ${r.toFixed(2)}R net`);
       continue;
     }
@@ -129,16 +143,13 @@ async function monitorTable(table: 'paper_trades' | 'shadow_trades', state: Reco
     // Atomic increments: several trades can close in one tick, and `state` is a stale snapshot
     await incState('daily_pnl', pnlAbs);
     await incState('capital', pnlAbs);
-    await incState(pnlAbs > 0 ? 'wins' : pnlAbs < 0 ? 'losses' : 'breakevens', 1);
+    await incState(outcome === 'win' ? 'wins' : outcome === 'loss' ? 'losses' : 'breakevens', 1);
 
-    const tfMin = TF_MINUTES[trade.timeframe] ?? 15;
-    const barsHeld = Math.round((now - parseInt(trade.opened_at)) / (tfMin * 60 * 1000));
-    // reward stays percent P&L (now net of costs) so the column keeps one unit across history
     await pool.query(
       `UPDATE rl_experience
-       SET reward = $1, outcome = $2, bars_held = $3, exit_reason = $4, updated_at = $5
+       SET reward = $1, outcome = $2, bars_held = $3, exit_reason = $4, updated_at = $5, outcome_source = 'paper'
        WHERE trade_id = $6`,
-      [pnlPct, pnlAbs > 0 ? 'win' : pnlAbs < 0 ? 'loss' : 'breakeven', barsHeld, exitReason, now, id],
+      [pnlPct, outcome, barsHeld, exitReason, now, id],
     );
 
     console.log(`[monitor] ${trade.symbol} closed via ${exitReason} ${r.toFixed(2)}R net ($${pnlAbs.toFixed(2)}, fees $${fees.toFixed(2)})`);

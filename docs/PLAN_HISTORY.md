@@ -6,6 +6,36 @@ here in the same commit.
 
 ---
 
+## 2026-10-06 (2) — Label every signal; multi-timeframe trend features
+
+**Decisions (Nitin):** build both offline labels and new features; label with
+**ATR triple-barrier** outcomes; store in **new Railway tables**; features =
+**multi-timeframe trend** only (volatility/structure/derivatives not chosen).
+
+- `signal_labels` — every logged signal (taken, shadowed or rejected), labelled
+  offline by `research/replay/label-signals.ts` from Bybit 1m candles, net of
+  the engine's cost model. Configs stored per row: `tb_2x1_48` (profit 2×ATR,
+  stop 1×ATR, 48 bars of the signal's timeframe) and `tb_3x1.5_48`. ATR(14) of
+  the signal's timeframe from bars closed before the signal. Stop checked before
+  profit inside each 1m bar; gapped stops fill at the open. Re-runnable.
+- `signal_features` — EMA20 slope and close-vs-EMA50 (both in ATRs) on 15m,
+  1h and 4h (4h built from complete 1h groups), over the last 120 bars.
+  Written live by the engine and backfilled by the labeller; both call
+  `lib/features.ts` on the same 500 closed bars, and Bybit's native 15m/1h
+  candles matched our 1m aggregation exactly (199/199 bars each), so live and
+  backfilled values agree. `FEATURE_VERSION` = 1.
+- Fix: the REST seed stored the still-forming candle as closed, leaving a
+  duplicate partial bar in every buffer after a restart (affected patterns,
+  ATR and these features). The seed now skips it and the buffer replaces a bar
+  that arrives twice.
+
+**Training caveats:** labels are policy-independent barrier outcomes, not the
+engine's exit policy. Barrier parameters are a first choice, not tuned — tuning
+them is a rule search and falls under the validation rules (combos counted,
+shuffle baseline, hold-out).
+
+---
+
 ## 2026-10-06 — RL data: label shadow outcomes
 
 **Goal (Nitin):** collect good data for reinforcement learning and, from it, a

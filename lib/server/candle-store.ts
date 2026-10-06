@@ -16,7 +16,9 @@ export function pushCandle(symbol: string, tf: string, candle: Candle, closed = 
   const buf = buffers.get(k)!;
 
   if (closed) {
-    buf.push(candle);
+    // A bar can arrive twice (REST seed, then the confirmed WebSocket candle); keep one
+    if (buf.length && buf[buf.length - 1].time === candle.time) buf[buf.length - 1] = candle;
+    else buf.push(candle);
     if (buf.length > MAX_CANDLES) buf.splice(0, buf.length - MAX_CANDLES);
   }
 

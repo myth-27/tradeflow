@@ -6,6 +6,7 @@ import { getPool, getState, incState } from './db';
 import { enforceDrawdownHalt } from './risk';
 import { getCandles, getLivePrice } from './candle-store';
 import { MAKER_FEE, MIN_STOP_PCT, STOP_SLIPPAGE, TAKER_FEE, netRiskReward } from './costs';
+import { FEATURE_VERSION, mtfTrend } from '@/lib/features';
 
 const SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT',
@@ -177,6 +178,22 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
      entry, stopLoss, best.target, riskReward,
      false, null, now],
   );
+
+  // Dataset features from closed bars only (buffers hold confirmed candles).
+  // Non-critical: a feature failure must never block signal handling.
+  try {
+    const f = mtfTrend(getCandles(symbol, '15m'), htfCandles);
+    await pool.query(
+      `INSERT INTO signal_features
+       (signal_id, feature_version, source, trend_15m_slope, trend_15m_pos,
+        trend_1h_slope, trend_1h_pos, trend_4h_slope, trend_4h_pos, computed_at)
+       VALUES ($1,$2,'live',$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (signal_id) DO NOTHING`,
+      [signalId, FEATURE_VERSION, f.trend_15m_slope, f.trend_15m_pos,
+       f.trend_1h_slope, f.trend_1h_pos, f.trend_4h_slope, f.trend_4h_pos, now],
+    );
+  } catch (err) {
+    console.error('[signal] feature write failed:', (err as Error).message);
+  }
 
   const rl = (tradeId: string | null, acted: boolean) => saveRlExperience(pool, {
     signalId, tradeId, symbol, tf, best: { ...best, stopLoss }, direction,

@@ -113,6 +113,17 @@ function connectBybit(tf: string): void {
   });
 }
 
+const TF_MS: Record<string, number> = { '5m': 300_000, '15m': 900_000, '1h': 3_600_000 };
+
+/**
+ * REST kline lists end with the candle that is still forming. Seeding it as closed
+ * left a partial bar in the buffer, and the confirmed version was later appended
+ * with the same timestamp — a duplicate bar after every restart.
+ */
+function isForming(openMs: number, tf: string): boolean {
+  return openMs + (TF_MS[tf] ?? 0) > Date.now();
+}
+
 async function seedHistoricalCandles(symbol: string, tf: string, interval: string): Promise<void> {
   const headers = { 'User-Agent': 'TradeFlow/1.0 paper-trading-engine' };
 
@@ -124,6 +135,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
       const data = await res.json() as { result: { list: string[][] } };
       const klines = data.result?.list ?? [];
       for (const k of [...klines].reverse()) {
+        if (isForming(parseInt(k[0]), tf)) continue;
         pushCandle(symbol, tf, {
           time: parseInt(k[0]) / 1000,
           open: parseFloat(k[1]),
@@ -146,6 +158,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
     if (res.ok) {
       const klines = await res.json() as string[][];
       for (const k of klines) {
+        if (isForming(parseInt(k[0]), tf)) continue;
         pushCandle(symbol, tf, {
           time: parseInt(k[0]) / 1000,
           open: parseFloat(k[1]),

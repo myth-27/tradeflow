@@ -153,6 +153,43 @@ export async function initDb(): Promise<void> {
     UPDATE rl_experience SET outcome_source = 'paper'
      WHERE outcome IS NOT NULL AND outcome_source IS NULL AND trade_id IS NOT NULL;
 
+    -- Dataset for supervised meta-labeling (see docs/PLAN_HISTORY.md, 2026-10-06).
+    -- Features: written by the engine at signal time (source 'live') and by
+    -- research/replay/label-signals.ts for older signals (source 'backfill').
+    -- Both use lib/features.ts on bars that closed before the signal.
+    CREATE TABLE IF NOT EXISTS signal_features (
+      signal_id        TEXT PRIMARY KEY,
+      feature_version  INTEGER NOT NULL,
+      source           TEXT NOT NULL,
+      trend_15m_slope  DOUBLE PRECISION,
+      trend_15m_pos    DOUBLE PRECISION,
+      trend_1h_slope   DOUBLE PRECISION,
+      trend_1h_pos     DOUBLE PRECISION,
+      trend_4h_slope   DOUBLE PRECISION,
+      trend_4h_pos     DOUBLE PRECISION,
+      computed_at      BIGINT NOT NULL
+    );
+
+    -- Labels: triple-barrier outcomes for EVERY logged signal (taken, shadowed or
+    -- rejected), net of costs, computed offline from Bybit 1m candles by
+    -- research/replay/label-signals.ts. The engine never writes here.
+    -- label: +1 profit barrier, -1 stop barrier, 0 time limit.
+    CREATE TABLE IF NOT EXISTS signal_labels (
+      signal_id        TEXT NOT NULL,
+      config           TEXT NOT NULL,
+      pt_atr           DOUBLE PRECISION NOT NULL,
+      sl_atr           DOUBLE PRECISION NOT NULL,
+      max_bars         INTEGER NOT NULL,
+      atr              DOUBLE PRECISION NOT NULL,
+      label            INTEGER NOT NULL,
+      ret_r_net        DOUBLE PRECISION NOT NULL,
+      ret_pct_net      DOUBLE PRECISION NOT NULL,
+      exit_reason      TEXT NOT NULL,
+      minutes_to_exit  DOUBLE PRECISION NOT NULL,
+      labelled_at      BIGINT NOT NULL,
+      PRIMARY KEY (signal_id, config)
+    );
+
     -- Backfill: shadow trades that closed before outcomes were written back
     -- (2026-10-04 → 06). Idempotent — only fills rows that are still unlabelled.
     UPDATE rl_experience r

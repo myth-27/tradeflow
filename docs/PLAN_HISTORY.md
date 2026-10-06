@@ -6,6 +6,27 @@ here in the same commit.
 
 ---
 
+## 2026-10-06 (3) — Candle buffers stay sorted and unique on reconnect
+
+Raised by the ship-reviewer: every WebSocket reconnect (routine, given the 90s
+watchdog) re-seeds up to 500 historical bars into a full buffer. The previous
+fix only de-duplicated the *last* bar, so reconnects still left duplicate and
+out-of-order bars feeding patterns, ATR and the dataset features. Live features
+written before this fix may be affected; prefer `source = 'backfill'` rows or
+recompute live ones when training.
+
+- `pushCandle` keeps each buffer sorted and unique by bar time (append newer,
+  replace a known bar in place, insert an older missing bar in order).
+- Seeded bars are flagged historical and never set the live price, so a
+  reconnect can't hand the trade monitor a stale price.
+- `research/replay/check-labeller.ts` commits the labeller's synthetic checks.
+  Labels begin at the first 1m bar opening at or after the signal (up to one
+  minute after detection).
+
+Bug fix: exempt from the strategy freeze. Engine is log-only.
+
+---
+
 ## 2026-10-06 (2) — Label every signal; multi-timeframe trend features
 
 **Decisions (Nitin):** build both offline labels and new features; label with
@@ -25,9 +46,8 @@ here in the same commit.
   candles matched our 1m aggregation exactly (199/199 bars each), so live and
   backfilled values agree. `FEATURE_VERSION` = 1.
 - Fix: the REST seed stored the still-forming candle as closed, leaving a
-  duplicate partial bar in every buffer after a restart (affected patterns,
-  ATR and these features). The seed now skips it and the buffer replaces a bar
-  that arrives twice.
+  partial bar plus a duplicate in the buffer after a restart. The seed now skips
+  the forming bar. (The broader reconnect problem is fixed in entry (3) above.)
 
 **Training caveats:** labels are policy-independent barrier outcomes, not the
 engine's exit policy. Barrier parameters are a first choice, not tuned — tuning

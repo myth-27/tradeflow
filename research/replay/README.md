@@ -24,7 +24,8 @@ with/against-trend split reports everything as neutral.
 | `analyze.cjs` | Expectancy gross vs net, by stop rule, pattern, period, timeframe, trend |
 | `nulltest.cjs` | How many "positive in every period" rule combos appear by pure chance? |
 | `baseline.cjs` | Do pattern entries beat random-direction entries with identical exits? t-stats |
-| `label-signals.ts` | Writes triple-barrier labels for every signal and backfills trend features into the Railway DB (`signal_labels`, `signal_features`). Run with `npx tsx research/replay/label-signals.ts`; re-run daily to label new signals. |
+| `label-signals.ts` | Writes triple-barrier labels for every signal and backfills trend features into the Railway DB (`signal_labels`, `signal_features`). Run with `npx tsx research/replay/label-signals.ts`; re-run daily to label new signals. Labels start at the first 1m bar opening at or after the signal. |
+| `check-labeller.ts` | Self-check of the barrier logic and cost math on synthetic paths (`npx tsx research/replay/check-labeller.ts`) |
 
 A setup is eligible for `ALLOWED_SETUPS` only if `baseline.cjs`-style testing
 shows it beats random-direction twins net of costs at t ≥ 3 over ≥ 300 trades.

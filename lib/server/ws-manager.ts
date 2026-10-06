@@ -143,7 +143,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
           low: parseFloat(k[3]),
           close: parseFloat(k[4]),
           volume: parseFloat(k[5]),
-        }, true);
+        }, true, true);
       }
       console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf} (Bybit)`);
       return;
@@ -166,7 +166,7 @@ async function seedHistoricalCandles(symbol: string, tf: string, interval: strin
           low: parseFloat(k[3]),
           close: parseFloat(k[4]),
           volume: parseFloat(k[5]),
-        }, true);
+        }, true, true);
       }
       console.log(`[ws] seeded ${klines.length} candles ${symbol} ${tf} (Binance US)`);
       return;

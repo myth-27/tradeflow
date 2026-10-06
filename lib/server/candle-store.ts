@@ -10,20 +10,40 @@ function key(symbol: string, tf: string): string {
   return `${symbol}:${tf}`;
 }
 
-export function pushCandle(symbol: string, tf: string, candle: Candle, closed = false): void {
+/**
+ * Store a closed bar, keeping each buffer sorted and unique by bar time.
+ *
+ * Every WebSocket reconnect (the 90s watchdog makes these routine) re-seeds up to
+ * 500 historical bars into a buffer that already holds them. Appending blindly left
+ * duplicate and out-of-order bars, which the pattern engine, ATR and dataset
+ * features all read. Newer bars append; a known bar is replaced in place; an older
+ * missing bar is inserted in order.
+ */
+export function pushCandle(
+  symbol: string, tf: string, candle: Candle, closed = false,
+  /** REST seed bars: stored, but never treated as the current price. */
+  historical = false,
+): void {
   const k = key(symbol, tf);
   if (!buffers.has(k)) buffers.set(k, []);
   const buf = buffers.get(k)!;
 
   if (closed) {
-    // A bar can arrive twice (REST seed, then the confirmed WebSocket candle); keep one
-    if (buf.length && buf[buf.length - 1].time === candle.time) buf[buf.length - 1] = candle;
-    else buf.push(candle);
+    const last = buf[buf.length - 1];
+    if (!last || candle.time > last.time) {
+      buf.push(candle);
+    } else {
+      let lo = 0, hi = buf.length;
+      while (lo < hi) { const m = (lo + hi) >> 1; if (buf[m].time < candle.time) lo = m + 1; else hi = m; }
+      if (buf[lo] && buf[lo].time === candle.time) buf[lo] = candle;
+      else buf.splice(lo, 0, candle);
+    }
     if (buf.length > MAX_CANDLES) buf.splice(0, buf.length - MAX_CANDLES);
   }
 
-  // Always track live price
-  livePrices.set(symbol, candle.close);
+  // Re-seeding on reconnect pushes old closes; they must not hand the trade
+  // monitor a stale price. Only live stream updates set the current price.
+  if (!historical) livePrices.set(symbol, candle.close);
 }
 
 export function getCandles(symbol: string, tf: string): Candle[] {

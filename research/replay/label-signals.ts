@@ -132,8 +132,15 @@ async function main() {
     'SELECT id, symbol, timeframe, direction, entry, detected_at, pattern FROM signal_log ORDER BY detected_at',
   )).rows.map((r: Record<string, unknown>) => ({ ...r, entry: Number(r.entry), detected_at: Number(r.detected_at) }) as Sig);
   const haveLabel = new Set((await pool.query('SELECT signal_id, config FROM signal_labels')).rows.map((r: { signal_id: string; config: string }) => r.signal_id + '|' + r.config));
-  const haveFeat = new Set((await pool.query('SELECT signal_id FROM signal_features')).rows.map((r: { signal_id: string }) => r.signal_id));
-  console.log(`signals ${signals.length} | already labelled ${haveLabel.size} | with features ${haveFeat.size}`);
+  // A feature row counts as done if the live engine wrote it, or if a backfill filled every
+  // value. Backfilled rows with gaps (too little candle history at the time) are recomputed.
+  const haveFeat = new Set((await pool.query(
+    `SELECT signal_id FROM signal_features
+      WHERE source = 'live'
+         OR (trend_15m_slope IS NOT NULL AND trend_15m_pos IS NOT NULL AND trend_1h_slope IS NOT NULL
+             AND trend_1h_pos IS NOT NULL AND trend_4h_slope IS NOT NULL AND trend_4h_pos IS NOT NULL)`,
+  )).rows.map((r: { signal_id: string }) => r.signal_id));
+  console.log(`signals ${signals.length} | already labelled ${haveLabel.size} | with complete features ${haveFeat.size}`);
 
   const labelRows: unknown[][] = [], featRows: unknown[][] = [];
   let noData = 0, pending = 0;
@@ -167,7 +174,13 @@ async function main() {
     }
   };
   await insert(`INSERT INTO signal_features (signal_id, feature_version, source, trend_15m_slope, trend_15m_pos, trend_1h_slope, trend_1h_pos, trend_4h_slope, trend_4h_pos, computed_at)
-                VALUES ? ON CONFLICT (signal_id) DO NOTHING`, featRows, 10);
+                VALUES ? ON CONFLICT (signal_id) DO UPDATE SET
+                  feature_version = EXCLUDED.feature_version,
+                  trend_15m_slope = EXCLUDED.trend_15m_slope, trend_15m_pos = EXCLUDED.trend_15m_pos,
+                  trend_1h_slope = EXCLUDED.trend_1h_slope, trend_1h_pos = EXCLUDED.trend_1h_pos,
+                  trend_4h_slope = EXCLUDED.trend_4h_slope, trend_4h_pos = EXCLUDED.trend_4h_pos,
+                  computed_at = EXCLUDED.computed_at
+                WHERE signal_features.source = 'backfill'`, featRows, 10);
   await insert(`INSERT INTO signal_labels (signal_id, config, pt_atr, sl_atr, max_bars, atr, label, ret_r_net, ret_pct_net, exit_reason, minutes_to_exit, labelled_at)
                 VALUES ? ON CONFLICT (signal_id, config) DO NOTHING`, labelRows, 12);
   console.log(`wrote ${featRows.length} feature rows, ${labelRows.length} label rows | not yet resolvable ${pending} | no candle data ${noData}`);

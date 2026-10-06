@@ -1,19 +1,28 @@
 // Fetch (or extend) Bybit USDT-perp 1-minute candles into data/k1m/<SYMBOL>.json.
-//   node research/replay/fetch-candles.cjs [startISO]     (default 2026-09-07)
+//   node research/replay/fetch-candles.cjs [startISO]     (default 2026-08-15)
+// Giving an earlier start than the stored data backfills the gap.
 // Bybit linear is the same market the live engine prices from.
 const fs = require('fs');
 const path = require('path');
 const SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'AVAXUSDT', 'LINKUSDT', 'DOGEUSDT', 'ADAUSDT', 'DOTUSDT'];
 const dir = path.join(__dirname, 'data', 'k1m');
 fs.mkdirSync(dir, { recursive: true });
-const defaultStart = Date.parse((process.argv[2] ?? '2026-09-07') + 'T00:00:00Z');
+const defaultStart = Date.parse((process.argv[2] ?? '2026-08-15') + 'T00:00:00Z');
 (async () => {
   for (const s of SYMBOLS) {
     const f = path.join(dir, `${s}.json`);
     const existing = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : [];
     const bars = new Map(existing.map(r => [r[0], r]));
-    let cur = existing.length ? existing.at(-1)[0] + 60000 : defaultStart;
-    const end = Date.now();
+    // Fetch whatever is missing on either side: history before the first stored
+    // bar (if an earlier start date is given) and everything after the last one.
+    const ranges = [];
+    if (!existing.length) ranges.push([defaultStart, Date.now()]);
+    else {
+      if (defaultStart < existing[0][0]) ranges.push([defaultStart, existing[0][0]]);
+      ranges.push([existing.at(-1)[0] + 60000, Date.now()]);
+    }
+    for (const [start, end] of ranges) {
+    let cur = start;
     while (cur < end) {
       const u = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${s}&interval=1&start=${cur}&end=${cur + 1000 * 60000 - 1}&limit=1000`;
       let j;
@@ -22,8 +31,9 @@ const defaultStart = Date.parse((process.argv[2] ?? '2026-09-07') + 'T00:00:00Z'
       cur += 1000 * 60000;
       await new Promise(r => setTimeout(r, 150));
     }
+    }
     const out = [...bars.values()].sort((a, b) => a[0] - b[0]);
     fs.writeFileSync(f, JSON.stringify(out));
-    console.log(s.padEnd(9), out.length, 'bars →', new Date(out.at(-1)[0]).toISOString());
+    console.log(s.padEnd(9), out.length, 'bars', new Date(out[0][0]).toISOString(), '→', new Date(out.at(-1)[0]).toISOString());
   }
 })();

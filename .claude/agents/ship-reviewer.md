@@ -28,7 +28,7 @@ read-only git (`git log`, `git diff`, `git show`) and reading data; nothing else
 ## Step 2 — classify the push
 
 - **strategy** — changes which signals trade, entries, stops, targets, exits,
-  filters, thresholds, symbols, timeframes, `TRADING_MODE`, `ALLOWED_SETUPS`.
+  filters, thresholds, symbols, timeframes, `TRADING_MODE`, `ALLOWED_SETUPS`, `VALIDATED_SETUPS`, `FORWARD_TEST_SETUPS`.
 - **risk** — position size, max open, daily/drawdown limits, halt behaviour.
 - **accounting** — how P&L, fees, wins/losses, capital or equity are computed.
 - **infra / UI / docs** — everything else.
@@ -62,18 +62,34 @@ rule or lesson it breaks.
 
 **Validation discipline**
 7. `TRADING_MODE` default changed from `log_only`, or anything added to
-   `ALLOWED_SETUPS` (code default or docs), **unless** the push includes evidence
+   `VALIDATED_SETUPS` (code default or docs), **unless** the push includes evidence
    meeting all of: net of costs; beats random-direction entries with identical
    exits at t ≥ 3; ≥ 300 trades; number of rule combinations tried stated;
    shuffled-outcome baseline beaten at the 95th percentile; hold-out looked at
    once. Evidence must come from `research/replay` (or shadow_trades) and be
    summarised in PLAN_HISTORY.md in the same push.
+
+   **Forward-test exception** — a setup may be added to `FORWARD_TEST_SETUPS`
+   (never to `VALIDATED_SETUPS`) without that evidence only if ALL hold, else FAIL:
+   a. PLAN_HISTORY has a dated entry recording it as **Nitin's explicit decision**,
+      naming the setup, stating it is unvalidated and why it was chosen;
+   b. every paper trade from it is labelled unvalidated (e.g. `forward test (unvalidated)`);
+   c. risk limits are untouched (0.25%, max 2 open, 3% daily, −10% drawdown halt);
+   d. shadow trades still run for every qualifying setup regardless of mode or halt;
+   e. promotion and stop rules are written down in the same entry.
+   The reviewer cannot make this decision on Nitin's behalf; no entry → FAIL.
 8. A replay/backtest result quoted in a commit message or doc without saying
    whether it is gross or net of costs and how many combinations were tried.
 9. More than one strategy change in one push, or a strategy change within the
    freeze window (4 weeks or 200 trades after the last strategy change — check
    PLAN_HISTORY and `git log`). Bug fixes and risk *reductions* are exempt; say
-   which exemption applies.
+   which exemption applies. **Freeze override:** a strategy change inside the
+   window is also allowed if a dated PLAN_HISTORY entry records Nitin's explicit
+   override for that specific change, and that entry is **already on master in
+   an earlier push** (check `git log origin/master -- docs/PLAN_HISTORY.md`). An
+   override written in the same push as the change it allows does not count.
+   Rule-7 forward-test decisions and changes to this file follow the same
+   ordering: governance first in its own push, then the engine change.
 10. A strategy, risk or accounting change with no PLAN_HISTORY.md entry in the
     same push.
 

@@ -6,6 +6,48 @@ here in the same commit.
 
 ---
 
+## 2026-10-11 (2) — Forward test: paper-trade Double Top short (unvalidated)
+
+**Decision (Nitin), made knowing it is unvalidated:** restart paper trading with
+**Double Top short** (5m and 15m) as a *forward test*. Experiment 001 had just
+failed, and nothing has passed rule 2. Shadow evidence at the time: Double Top
+short +18.7R over 34 closed shadows (56–67% wins); all shadows −7.2R over 171
+(t ≈ −0.4). Caveats stated when deciding: it is the best of 12 setups on small
+samples (selection bias), and it was negative **net of costs** in the
+25,000-signal replay (experiment 001, take-all). Both shadow figures are net.
+
+**Freeze override (Nitin, 2026-10-11):** this lands one week into the freeze
+that started with the 2026-10-04 strategy change (4 weeks / 200 trades, i.e.
+until ~2026-11-01). The ship reviewer blocked it on that rule; Nitin explicitly
+chose to **override the freeze for this forward test only**. The freeze is not
+lifted for anything else, and this change starts a new freeze window
+(4 weeks / 200 trades from 2026-10-11). The reviewer's forward-test exception
+(rule 7) and the rule-9 override path land in this governance push, which
+Nitin pushes himself before the engine change.
+
+**How it runs:**
+- `TRADING_MODE=paper` (Railway variable). `FORWARD_TEST_SETUPS` in code holds
+  only `Double Top|short`; `VALIDATED_SETUPS` stays empty. Every paper trade is
+  labelled on the trade row (`paper_trades.validation_status =
+  'forward_test_unvalidated'`, plus `signal_id`), in `signal_log.reason`, and
+  with an UNVALIDATED badge on the live dashboard.
+- Paper history before 2026-10-04 is gross of fees; read the forward test from
+  `validation_status = 'forward_test_unvalidated'` rows only.
+- Unchanged risk: 0.25% of equity, max 2 open, 3% daily limit, auto-halt at
+  −10% from the equity peak (manual restart).
+- **Shadows now run for every qualifying setup in every mode**, so evidence
+  collection never depends on the paper account. Halts, the drawdown breaker
+  and the daily limit block paper entries only.
+
+**Promotion and stop rules (fixed now):**
+- Double Top short moves to `VALIDATED_SETUPS` only by passing rule 2 on data
+  collected **after** this decision (forward shadows + paper trades), at t ≥ 3
+  over ≥ 300 trades, versus random-direction entries.
+- The forward test is reviewed after **100 paper trades**. It stops early if the
+  drawdown halt fires; restarting it needs a new dated decision here.
+
+---
+
 ## 2026-10-11 — Engine in eu-west on Bybit seeds; candle-history repair; experiment 001
 
 - **Railway trial had expired** (no deploys since 6 Oct; pushes and the region

@@ -59,3 +59,6 @@ data/
 
 # replay inputs (signal dumps, candles) — large, regenerable
 research/replay/data/
+
+# experiment datasets (regenerable)
+research/experiments/*/data/

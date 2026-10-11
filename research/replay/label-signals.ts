@@ -29,7 +29,7 @@ export const CONFIGS = [
 ];
 const TF_MIN: Record<string, number> = { '5m': 5, '15m': 15, '1h': 60 };
 
-type K1 = [number, number, number, number, number]; // [openMs, o, h, l, c]
+export type K1 = [number, number, number, number, number]; // [openMs, o, h, l, c]
 
 function dbUrl(): string {
   if (process.env.DBURL) return process.env.DBURL;
@@ -39,7 +39,7 @@ function dbUrl(): string {
 }
 
 /** Aggregate 1m bars into complete `min`-minute bars (time in seconds, bar open). */
-function aggregate1m(k: K1[], min: number): Bar[] {
+export function aggregate1m(k: K1[], min: number): Bar[] {
   const span = min * 60000;
   const out: Bar[] = [];
   let cur: Bar | null = null, count = 0, curStart = -1;
@@ -72,12 +72,12 @@ function lowerBound(n: number, key: (i: number) => number, x: number): number {
 const LIVE_BUFFER = 500;
 
 /** The last LIVE_BUFFER bars of `tfMin` that closed at or before time t (ms). */
-function closedBefore(bars: Bar[], tfMin: number, tMs: number): Bar[] {
+export function closedBefore(bars: Bar[], tfMin: number, tMs: number): Bar[] {
   const end = lowerBound(bars.length, i => bars[i].time * 1000 + tfMin * 60000, tMs + 1);
   return bars.slice(Math.max(0, end - LIVE_BUFFER), end);
 }
 
-interface Sig { id: string; symbol: string; timeframe: string; direction: string; entry: number; detected_at: number; pattern: string }
+export interface Sig { id: string; symbol: string; timeframe: string; direction: string; entry: number; detected_at: number; pattern: string }
 
 export function barrier(sig: Sig, k: K1[], atrVal: number, c: typeof CONFIGS[number]) {
   const long = sig.direction === 'long', dir = long ? 1 : -1;
@@ -131,15 +131,26 @@ async function main() {
   const signals: Sig[] = (await pool.query(
     'SELECT id, symbol, timeframe, direction, entry, detected_at, pattern FROM signal_log ORDER BY detected_at',
   )).rows.map((r: Record<string, unknown>) => ({ ...r, entry: Number(r.entry), detected_at: Number(r.detected_at) }) as Sig);
-  const haveLabel = new Set((await pool.query('SELECT signal_id, config FROM signal_labels')).rows.map((r: { signal_id: string; config: string }) => r.signal_id + '|' + r.config));
+  // --recompute: rebuild every label and every backfilled feature row from the current
+  // candles (e.g. after `fetch-candles.cjs --repair`). Live-engine rows are never touched.
+  const recompute = process.argv.includes('--recompute');
+  const prevLabels = new Map<string, { r: number; label: number }>(
+    (await pool.query('SELECT signal_id, config, ret_r_net, label FROM signal_labels')).rows
+      .map((r: { signal_id: string; config: string; ret_r_net: number; label: number }) =>
+        [r.signal_id + '|' + r.config, { r: Number(r.ret_r_net), label: Number(r.label) }]),
+  );
+  const haveLabel = new Set(recompute ? [] : prevLabels.keys());
   // A feature row counts as done if the live engine wrote it, or if a backfill filled every
   // value. Backfilled rows with gaps (too little candle history at the time) are recomputed.
   const haveFeat = new Set((await pool.query(
-    `SELECT signal_id FROM signal_features
-      WHERE source IN ('live', 'live_mixed')
-         OR (trend_15m_slope IS NOT NULL AND trend_15m_pos IS NOT NULL AND trend_1h_slope IS NOT NULL
-             AND trend_1h_pos IS NOT NULL AND trend_4h_slope IS NOT NULL AND trend_4h_pos IS NOT NULL)`,
+    recompute
+      ? `SELECT signal_id FROM signal_features WHERE source IN ('live', 'live_mixed')`
+      : `SELECT signal_id FROM signal_features
+          WHERE source IN ('live', 'live_mixed')
+             OR (trend_15m_slope IS NOT NULL AND trend_15m_pos IS NOT NULL AND trend_1h_slope IS NOT NULL
+                 AND trend_1h_pos IS NOT NULL AND trend_4h_slope IS NOT NULL AND trend_4h_pos IS NOT NULL)`,
   )).rows.map((r: { signal_id: string }) => r.signal_id));
+  if (recompute) console.log('RECOMPUTE mode: all labels and backfilled features will be rebuilt');
   console.log(`signals ${signals.length} | already labelled ${haveLabel.size} | with complete features ${haveFeat.size}`);
 
   const labelRows: unknown[][] = [], featRows: unknown[][] = [];
@@ -182,8 +193,22 @@ async function main() {
                   computed_at = EXCLUDED.computed_at
                 WHERE signal_features.source = 'backfill'`, featRows, 10);
   await insert(`INSERT INTO signal_labels (signal_id, config, pt_atr, sl_atr, max_bars, atr, label, ret_r_net, ret_pct_net, exit_reason, minutes_to_exit, labelled_at)
-                VALUES ? ON CONFLICT (signal_id, config) DO NOTHING`, labelRows, 12);
+                VALUES ? ON CONFLICT (signal_id, config) DO UPDATE SET
+                  pt_atr = EXCLUDED.pt_atr, sl_atr = EXCLUDED.sl_atr, max_bars = EXCLUDED.max_bars,
+                  atr = EXCLUDED.atr, label = EXCLUDED.label, ret_r_net = EXCLUDED.ret_r_net,
+                  ret_pct_net = EXCLUDED.ret_pct_net, exit_reason = EXCLUDED.exit_reason,
+                  minutes_to_exit = EXCLUDED.minutes_to_exit, labelled_at = EXCLUDED.labelled_at`, labelRows, 12);
   console.log(`wrote ${featRows.length} feature rows, ${labelRows.length} label rows | not yet resolvable ${pending} | no candle data ${noData}`);
+  if (recompute) {
+    let changed = 0, flipped = 0;
+    for (const row of labelRows) {
+      const prev = prevLabels.get(row[0] + '|' + row[1]);
+      if (!prev) continue;
+      if (Math.abs(prev.r - (row[7] as number)) > 1e-9) changed++;
+      if (prev.label !== row[6]) flipped++;
+    }
+    console.log(`recompute: ${changed} labels changed value, ${flipped} changed outcome class`);
+  }
 
   // Summary of everything labelled so far
   const sum = await pool.query(`

@@ -6,6 +6,25 @@ here in the same commit.
 
 ---
 
+## 2026-10-11 — Engine in eu-west on Bybit seeds; candle-history repair; experiment 001
+
+- **Railway trial had expired** (no deploys since 6 Oct; pushes and the region
+  change silently went nowhere). After Nitin activated a plan, the reviewed
+  commit was deployed with `railway up`: region `europe-west4`, one replica,
+  **27/27 seeds from Bybit**. GitHub-triggered deploys still need checking.
+  Full read-only backup taken first: `data/backups/railway_2026-10-11/`.
+- **Corrupted 1m candles:** `fetch-candles.cjs` stored the still-forming minute at
+  the end of every run and never revisited it — one partial bar per past run
+  (4–7 per symbol, 58 total; e.g. ETH 2026-10-04 06:22 low 2694.59 vs Bybit
+  2692.87). Found by experiment 001's feature-reproduction check. Fixed: the
+  forming minute is never stored, each run re-fetches a 5-minute overlap, and
+  `--repair` re-downloaded everything (ETH re-verified: 0 differences). Labels
+  and backfilled features are rebuilt with `label-signals.ts --recompute`.
+- **Experiment 001** (meta-labeling) pre-registered in
+  `docs/research/001-meta-labeling-prereg.md` before any fitting.
+
+---
+
 ## 2026-10-06 (4) — The engine's candle history came from Binance US
 
 **Found:** live and backfilled features disagreed on all 21 signals checked (up

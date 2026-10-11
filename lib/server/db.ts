@@ -114,6 +114,10 @@ export async function initDb(): Promise<void> {
     -- trades closed before that (fees_abs IS NULL) were recorded gross.
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS fees_abs DOUBLE PRECISION;
     ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS r_multiple DOUBLE PRECISION;
+    -- 'validated' or 'forward_test_unvalidated' (PLAN_HISTORY 2026-10-11 (2)); NULL for
+    -- trades opened before setups were labelled. signal_id links back to signal_log.
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS validation_status TEXT;
+    ALTER TABLE paper_trades ADD COLUMN IF NOT EXISTS signal_id TEXT;
 
     -- Log-only mode: every tradeable setup is followed with the same exit rules and
     -- costs as a paper trade, but nothing here touches capital, wins or daily P&L.

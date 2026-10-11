@@ -26,6 +26,17 @@ interface Trade {
   pnl_pct?: number;
   pnl_abs?: number;
   status: string;
+  validation_status?: string | null;
+}
+
+// Forward-test trades are unvalidated (PLAN_HISTORY 2026-10-11 (2)) — always flag them.
+function ForwardTestBadge({ status }: { status?: string | null }) {
+  if (status !== 'forward_test_unvalidated') return null;
+  return (
+    <span className="ml-1 px-1 py-0.5 rounded text-[9px] font-bold bg-amber-900/60 text-amber-300" title="Forward test — not validated">
+      UNVALIDATED
+    </span>
+  );
 }
 
 interface Signal {
@@ -537,7 +548,7 @@ export default function LivePage() {
                         <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
                           {t.direction === 'long' ? 'L' : 'S'}
                         </td>
-                        <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
+                        <td className="py-2 px-2 text-gray-300">{t.pattern}<ForwardTestBadge status={t.validation_status} /></td>
                         <td className="py-2 px-2">{fmtPrice(t.entry)}</td>
                         <td className="py-2 px-2 text-red-400">
                           {fmtPrice(t.stop_loss)}{t.tp1_hit ? ' ✓BE' : ''}
@@ -635,7 +646,7 @@ export default function LivePage() {
                         </td>
                         <td className="py-2 px-2 text-white">{t.symbol.replace('USDT', '')}</td>
                         <td className="py-2 px-2 text-gray-500">{t.timeframe}</td>
-                        <td className="py-2 px-2 text-gray-300">{t.pattern}</td>
+                        <td className="py-2 px-2 text-gray-300">{t.pattern}<ForwardTestBadge status={t.validation_status} /></td>
                         <td className={`py-2 px-2 font-bold ${t.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
                           {t.direction === 'long' ? 'L' : 'S'}
                         </td>

@@ -27,9 +27,10 @@ const SIGNAL_TIMEFRAMES = new Set(['5m', '15m']);
 const MIN_CANDLES = 50;
 
 /**
- * 'log_only' (default): no paper trades. Every setup that passes the stop and
- * R:R rules is followed as a shadow trade so its net-of-cost result is recorded.
- * 'paper': open paper trades, but ONLY for setups listed in ALLOWED_SETUPS.
+ * Every setup that passes the stop and R:R rules is followed as a shadow trade in
+ * ALL modes, so its net-of-cost result is recorded.
+ * 'log_only' (default): shadows only, no paper trades.
+ * 'paper': additionally open paper trades for PAPER_SETUPS (validated + forward test).
  *
  * Why log-only: a cost-aware replay of all 11,540 logged signals (8 Sep – 4 Oct)
  * found no setup with positive expectancy net of fees. Gross expectancy was
@@ -49,12 +50,22 @@ const TRADING_MODE: 'log_only' | 'paper' = process.env.TRADING_MODE === 'paper' 
 const VALIDATED_SETUPS = new Set<string>([]);
 
 /**
- * The ALLOWED_SETUPS env var can only NARROW the validated list (e.g. pause one
- * setup). Anything it names that isn't validated is ignored.
+ * UNVALIDATED forward tests, by Nitin's explicit decision (PLAN_HISTORY 2026-10-11 (2)).
+ * These have NOT passed validation: Double Top short was the best shadow result
+ * (+18.7R over 34 trades) but is the best of 12 setups on small samples, and was
+ * negative in the 25,000-signal replay. Paper-traded at the normal 0.25% risk under
+ * the -10% drawdown halt, and labelled 'forward test (unvalidated)' on every trade.
  */
-const ALLOWED_SETUPS = new Set(
-  (process.env.ALLOWED_SETUPS ?? Array.from(VALIDATED_SETUPS).join(','))
-    .split(',').map(s => s.trim()).filter(s => s && VALIDATED_SETUPS.has(s)),
+const FORWARD_TEST_SETUPS = new Set<string>(['Double Top|short']);
+
+/**
+ * Setups that may paper-trade: validated ∪ forward test. The ALLOWED_SETUPS env var
+ * can only NARROW this list (e.g. pause one setup); anything else it names is ignored.
+ */
+const CODE_PAPER_SETUPS = new Set<string>([...Array.from(VALIDATED_SETUPS), ...Array.from(FORWARD_TEST_SETUPS)]);
+const PAPER_SETUPS = new Set(
+  (process.env.ALLOWED_SETUPS ?? Array.from(CODE_PAPER_SETUPS).join(','))
+    .split(',').map(s => s.trim()).filter(s => s && CODE_PAPER_SETUPS.has(s)),
 );
 
 const MAX_OPEN_TRADES = 2;            // crypto majors move together; 4 shorts were one bet
@@ -75,7 +86,7 @@ const MAX_DAILY_LOSS_PCT = 0.03;
 
 // Effective configuration, logged once at startup so a deploy's behaviour is visible in its logs
 console.log(
-  `[config] mode=${TRADING_MODE} allowedSetups=[${Array.from(ALLOWED_SETUPS).join(', ')}] ` +
+  `[config] mode=${TRADING_MODE} paperSetups=[${Array.from(PAPER_SETUPS).join(', ')}] forwardTest=[${Array.from(FORWARD_TEST_SETUPS).filter(s => PAPER_SETUPS.has(s)).join(', ')}] ` +
   `risk=${RISK_PER_TRADE} maxOpen=${MAX_OPEN_TRADES} minNetRR=${MIN_RR} dailyLoss=${MAX_DAILY_LOSS_PCT} ` +
   `minStop=${MIN_STOP_PCT} taker=${TAKER_FEE} maker=${MAKER_FEE} stopSlip=${STOP_SLIPPAGE}`,
 );
@@ -107,13 +118,12 @@ export function processNewCandle(symbol: string, tf: string): Promise<void> {
 async function evaluateCandle(symbol: string, tf: string): Promise<void> {
 
   const state = await getState();
-  if (state['halted'] === 'true') return;
+  // Halts, the drawdown breaker and the daily limit block PAPER entries only (checked
+  // where a paper trade would open). Signal logging and shadows always continue.
   // Risk and the daily limit scale with current equity, not starting capital
   const equity = parseFloat(state['capital'] ?? String(CAPITAL));
-  if (TRADING_MODE === 'paper' && await enforceDrawdownHalt(state, equity)) return;
   const dailyLossLimit = equity * MAX_DAILY_LOSS_PCT;
   const dailyPnl = parseFloat(state['daily_pnl'] ?? '0');
-  if (TRADING_MODE === 'paper' && dailyPnl <= -dailyLossLimit) return;
 
   const ck = `${symbol}:${tf}`;
   const lastFired = lastSignalTime.get(ck) ?? 0;
@@ -225,60 +235,69 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   const tp1 = direction === 'long' ? entry + stopDistPrice * 1.5 : entry - stopDistPrice * 1.5;
   const tp2 = best.target;
 
-  if (TRADING_MODE === 'log_only') {
-    // One open shadow per setup per symbol/timeframe; no capital, no position limits
-    const { rows } = await pool.query(
-      `SELECT 1 FROM shadow_trades
-       WHERE status = 'open' AND symbol = $1 AND timeframe = $2 AND pattern = $3 AND direction = $4`,
-      [symbol, tf, best.name, direction]);
-    if (rows.length) return reject('log-only: same setup already being shadowed');
-
-    const shadowId = uuidv4();
+  // --- Shadow: EVERY qualifying setup, in every mode. ---
+  // Shadows are the evidence base; they continue regardless of paper trading, halts
+  // or the daily limit, so the dataset never has gaps that depend on the account.
+  const { rows: openShadow } = await pool.query(
+    `SELECT 1 FROM shadow_trades
+     WHERE status = 'open' AND symbol = $1 AND timeframe = $2 AND pattern = $3 AND direction = $4`,
+    [symbol, tf, best.name, direction]);
+  const shadowed = openShadow.length === 0;
+  if (shadowed) {
     await pool.query(
       `INSERT INTO shadow_trades
        (id, signal_id, symbol, timeframe, direction, entry, stop_loss, tp1, tp2, size,
         pattern, edge_score, tier, opened_at, status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'open')`,
-      [shadowId, signalId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
+      [uuidv4(), signalId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
        best.name, estimatedEdge, tier, now],
     );
-    await pool.query(`UPDATE signal_log SET reason = $1 WHERE id = $2`, ['log-only: shadowed', signalId]);
-    await rl(null, false);
-    lastSignalTime.set(ck, now);
     console.log(`[signal] shadow ${symbol} ${tf} ${direction} ${best.name} netRR=${riskReward.toFixed(2)}`);
-    return;
+  }
+  let reason = shadowed ? 'shadowed' : 'same setup already being shadowed';
+
+  // --- Paper trade: paper mode only, and only for validated or forward-test setups. ---
+  let tradeId: string | null = null;
+  if (TRADING_MODE === 'paper') {
+    let blocked: string | null = null;
+    if (!PAPER_SETUPS.has(setup)) blocked = 'setup not allowed';
+    else if (state['halted'] === 'true') blocked = 'halted';
+    else if (await enforceDrawdownHalt(state, equity)) blocked = 'drawdown halt';
+    else if (dailyPnl <= -dailyLossLimit) blocked = 'daily loss limit';
+    else {
+      const { rows: openTrades } = await pool.query(`SELECT symbol FROM paper_trades WHERE status = 'open'`);
+      if (openTrades.some((t: { symbol: string }) => t.symbol === symbol)) blocked = 'already in trade';
+      else if (openTrades.length >= MAX_OPEN_TRADES) blocked = `max open trades (${MAX_OPEN_TRADES})`;
+      // Daily limit counts open risk too, otherwise several trades opened just under the limit all lose
+      else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -dailyLossLimit) blocked = 'daily loss limit incl. open risk';
+    }
+
+    if (blocked) {
+      reason += `; paper: ${blocked}`;
+    } else {
+      tradeId = uuidv4();
+      const validated = VALIDATED_SETUPS.has(setup);
+      // The label lives on the trade row itself so the dashboard and any P&L query can
+      // separate forward-test trades from validated ones without joining signal_log.
+      await pool.query(
+        `INSERT INTO paper_trades
+         (id, symbol, timeframe, direction, entry, stop_loss, tp1, tp2, size,
+          pattern, edge_score, tier, opened_at, status, validation_status, signal_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'open',$14,$15)`,
+        [tradeId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
+         best.name, estimatedEdge, tier, now,
+         validated ? 'validated' : 'forward_test_unvalidated', signalId],
+      );
+      await incState('total_trades', 1);
+      const kind = validated ? 'validated' : 'forward test (unvalidated)';
+      reason += `; paper: opened (${kind})`;
+      console.log(`[signal] PAPER ${symbol} ${tf} ${direction} ${best.name} netRR=${riskReward.toFixed(2)} — ${kind}`);
+    }
   }
 
-  // --- paper mode ---
-  if (!ALLOWED_SETUPS.has(setup)) return reject(`setup not validated: ${best.name} ${direction}`);
-
-  const { rows: openTrades } = await pool.query(
-    `SELECT symbol FROM paper_trades WHERE status = 'open'`);
-  let skipReason: string | null = null;
-  if (openTrades.some((t: { symbol: string }) => t.symbol === symbol)) skipReason = 'already in trade';
-  else if (openTrades.length >= MAX_OPEN_TRADES) skipReason = `max open trades (${MAX_OPEN_TRADES})`;
-  // Daily limit counts open risk too, otherwise several trades opened just under the limit all lose
-  else if (dailyPnl - openTrades.length * riskAmt - riskAmt < -dailyLossLimit) {
-    skipReason = 'daily loss limit incl. open risk';
-  }
-  if (skipReason) return reject(skipReason);
-
-  const tradeId = uuidv4();
-  await pool.query(
-    `INSERT INTO paper_trades
-     (id, symbol, timeframe, direction, entry, stop_loss, tp1, tp2, size,
-      pattern, edge_score, tier, opened_at, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'open')`,
-    [tradeId, symbol, tf, direction, entry, stopLoss, tp1, tp2, size,
-     best.name, estimatedEdge, tier, now],
-  );
-
-  await pool.query(`UPDATE signal_log SET acted = true WHERE id = $1`, [signalId]);
-  await rl(tradeId, true);
-  await incState('total_trades', 1);
-
-  lastSignalTime.set(ck, now);
-  console.log(`[signal] ${symbol} ${tf} ${direction} ${best.name} netRR=${riskReward.toFixed(2)} edge=${estimatedEdge}`);
+  await pool.query(`UPDATE signal_log SET reason = $1, acted = $2 WHERE id = $3`, [reason, tradeId !== null, signalId]);
+  await rl(tradeId, tradeId !== null);
+  if (shadowed || tradeId) lastSignalTime.set(ck, now);
 }
 
 async function saveRlExperience(pool: ReturnType<typeof getPool>, p: {

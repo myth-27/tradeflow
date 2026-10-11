@@ -6,6 +6,32 @@ here in the same commit.
 
 ---
 
+## 2026-10-06 (4) — The engine's candle history came from Binance US
+
+**Found:** live and backfilled features disagreed on all 21 signals checked (up
+to 1.03 ATR), live values consistently larger. Bybit's native candles match our
+1m aggregation exactly, so the live buffers had to differ — and the Railway logs
+showed **every candle seed (27/27) came from the Binance US fallback**, none from
+Bybit. Bybit's REST API is unreachable from Railway's US region (sfo); this has
+likely been true since the July Railway setup.
+
+**Consequences:** the live engine has run on mixed history — Binance US spot bars
+for the past, Bybit perpetual bars from connect time on. Pattern detection, ATR
+and live features all read that mix, while entries and every replay label use
+Bybit. The offline backfill (pure Bybit) is unaffected and is the only feature
+source to train on.
+
+**Decisions (Nitin):**
+- Move the engine to Railway **eu-west (Amsterdam)** so the seed can reach Bybit
+  (exactly one replica: `eu-west=1 us-west=0`). Bybit restricts some EU users too,
+  so the post-move seed log is the real test.
+- **Tag mixed data**: every buffered bar records its source exchange; live feature
+  rows built on any Binance US bar are written as `source = 'live_mixed'`. The 21
+  earlier live rows are retagged once (marker `migr_live_mixed_v1`). The labeller
+  leaves `live_mixed` rows alone; exclude them when training.
+
+---
+
 ## 2026-10-06 (3) — Candle buffers stay sorted and unique on reconnect
 
 Raised by the ship-reviewer: every WebSocket reconnect (routine, given the 90s

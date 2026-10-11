@@ -4,7 +4,7 @@ import { classifyRegime } from '@/lib/simulator';
 import { quickEdgeEstimate } from '@/lib/edge-score';
 import { getPool, getState, incState } from './db';
 import { enforceDrawdownHalt } from './risk';
-import { getCandles, getLivePrice } from './candle-store';
+import { bufferIsMixed, getCandles, getLivePrice } from './candle-store';
 import { MAKER_FEE, MIN_STOP_PCT, STOP_SLIPPAGE, TAKER_FEE, netRiskReward } from './costs';
 import { FEATURE_VERSION, mtfTrend } from '@/lib/features';
 
@@ -183,12 +183,16 @@ async function evaluateCandle(symbol: string, tf: string): Promise<void> {
   // Non-critical: a feature failure must never block signal handling.
   try {
     const f = mtfTrend(getCandles(symbol, '15m'), htfCandles);
+    // 'live_mixed' when any bar behind these features came from the Binance US seed
+    // fallback: such rows don't match the pure-Bybit backfill and should be excluded
+    // from training (PLAN_HISTORY 2026-10-06 (4)).
+    const featureSource = bufferIsMixed(symbol, '15m') || bufferIsMixed(symbol, '1h') ? 'live_mixed' : 'live';
     await pool.query(
       `INSERT INTO signal_features
        (signal_id, feature_version, source, trend_15m_slope, trend_15m_pos,
         trend_1h_slope, trend_1h_pos, trend_4h_slope, trend_4h_pos, computed_at)
-       VALUES ($1,$2,'live',$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (signal_id) DO NOTHING`,
-      [signalId, FEATURE_VERSION, f.trend_15m_slope, f.trend_15m_pos,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT (signal_id) DO NOTHING`,
+      [signalId, FEATURE_VERSION, featureSource, f.trend_15m_slope, f.trend_15m_pos,
        f.trend_1h_slope, f.trend_1h_pos, f.trend_4h_slope, f.trend_4h_pos, now],
     );
   } catch (err) {

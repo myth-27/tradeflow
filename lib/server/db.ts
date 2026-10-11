@@ -190,6 +190,17 @@ export async function initDb(): Promise<void> {
       PRIMARY KEY (signal_id, config)
     );
 
+    -- One-time: live feature rows written before seed sources were tracked all came
+    -- from buffers seeded by the Binance US fallback (every seed in the Railway logs
+    -- on 2026-10-06). Mark them mixed once; the marker stops later runs from touching
+    -- genuinely pure 'live' rows.
+    UPDATE signal_features SET source = 'live_mixed'
+     WHERE source = 'live'
+       AND NOT EXISTS (SELECT 1 FROM system_state WHERE key = 'migr_live_mixed_v1');
+    INSERT INTO system_state (key, value)
+    VALUES ('migr_live_mixed_v1', (extract(epoch FROM now()) * 1000)::bigint::text)
+    ON CONFLICT (key) DO NOTHING;
+
     -- Backfill: shadow trades that closed before outcomes were written back
     -- (2026-10-04 → 06). Idempotent — only fills rows that are still unlabelled.
     UPDATE rl_experience r

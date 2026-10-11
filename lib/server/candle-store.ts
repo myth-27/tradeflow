@@ -2,8 +2,17 @@ import type { Candle } from '@/lib/binance-ws';
 
 const MAX_CANDLES = 500;
 
+/**
+ * Exchange a bar came from. Live bars are always Bybit (perpetuals). The REST seed
+ * falls back to Binance US (spot) when Bybit's REST API is unreachable — which the
+ * Railway logs showed for every seed on 2026-10-06 — leaving buffers that mix two
+ * markets. Tracked per bar so dataset rows built on mixed data can be flagged.
+ */
+export type BarSource = 'bybit' | 'binanceus';
+type StoredCandle = Candle & { src?: BarSource };
+
 // key: "BTCUSDT:15m"
-const buffers = new Map<string, Candle[]>();
+const buffers = new Map<string, StoredCandle[]>();
 const livePrices = new Map<string, number>();
 
 function key(symbol: string, tf: string): string {
@@ -23,12 +32,14 @@ export function pushCandle(
   symbol: string, tf: string, candle: Candle, closed = false,
   /** REST seed bars: stored, but never treated as the current price. */
   historical = false,
+  source: BarSource = 'bybit',
 ): void {
   const k = key(symbol, tf);
   if (!buffers.has(k)) buffers.set(k, []);
   const buf = buffers.get(k)!;
 
   if (closed) {
+    candle = { ...candle, src: source } as StoredCandle;
     const last = buf[buf.length - 1];
     if (!last || candle.time > last.time) {
       buf.push(candle);
@@ -48,6 +59,11 @@ export function pushCandle(
 
 export function getCandles(symbol: string, tf: string): Candle[] {
   return buffers.get(key(symbol, tf)) ?? [];
+}
+
+/** True if any bar in this buffer came from a non-Bybit seed (Binance US). */
+export function bufferIsMixed(symbol: string, tf: string): boolean {
+  return (buffers.get(key(symbol, tf)) ?? []).some(b => b.src === 'binanceus');
 }
 
 export function calcATR(symbol: string, tf: string, period = 14): number {

@@ -136,7 +136,7 @@ async function main() {
   // value. Backfilled rows with gaps (too little candle history at the time) are recomputed.
   const haveFeat = new Set((await pool.query(
     `SELECT signal_id FROM signal_features
-      WHERE source = 'live'
+      WHERE source IN ('live', 'live_mixed')
          OR (trend_15m_slope IS NOT NULL AND trend_15m_pos IS NOT NULL AND trend_1h_slope IS NOT NULL
              AND trend_1h_pos IS NOT NULL AND trend_4h_slope IS NOT NULL AND trend_4h_pos IS NOT NULL)`,
   )).rows.map((r: { signal_id: string }) => r.signal_id));

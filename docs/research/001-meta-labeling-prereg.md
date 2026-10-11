@@ -81,4 +81,10 @@ variants tried: **2**.
 
 ## Amendments
 
-(none)
+**A1 — 2026-10-11, before any model was fitted.** Signals detected 6–11 Oct
+have only `live_mixed` feature rows (built on Binance US–seeded buffers), so the
+"backfill only" rule would drop ~8,000 signals. Instead, the dataset builder
+computes pure-Bybit features for **every** signal locally, with the same
+`lib/features.ts` code and the same 500-closed-bar inputs the backfill uses. It
+must reproduce every existing `source = 'backfill'` row exactly (max abs diff
+< 1e-9) or the run stops. No `live` or `live_mixed` values are used.

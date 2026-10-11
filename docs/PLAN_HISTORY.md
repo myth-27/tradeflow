@@ -21,7 +21,13 @@ here in the same commit.
   `--repair` re-downloaded everything (ETH re-verified: 0 differences). Labels
   and backfilled features are rebuilt with `label-signals.ts --recompute`.
 - **Experiment 001** (meta-labeling) pre-registered in
-  `docs/research/001-meta-labeling-prereg.md` before any fitting.
+  `docs/research/001-meta-labeling-prereg.md` before any fitting, run once:
+  **FAIL on all four criteria** (`docs/research/001-meta-labeling-results.md`).
+  No model found a profitable or better-than-random subset; the chosen model
+  took zero hold-out signals. Per the prereg: no further model search on these
+  inputs; next step is better inputs (volatility, structure, derivatives, 1h/4h).
+- Live features verified against the backfill after the Bybit seed fix: 9 of 9
+  identical (max diff 0). GitHub-triggered Railway deploys work again.
 
 ---
 

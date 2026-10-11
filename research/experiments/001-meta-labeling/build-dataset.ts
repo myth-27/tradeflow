@@ -68,9 +68,9 @@ async function main() {
     const cluster = prev && t - prev.t < CLUSTER_GAP_MS ? prev.cluster : nextCluster++;
     lastSeen.set(ck, { t, cluster });
 
-    const lab = labels.get(s.id);
-    if (!lab?.['tb_3x1.5_48'] || !lab?.['tb_2x1_48'] || !K[s.symbol]) { skipped++; continue; }
-
+    if (!K[s.symbol]) { skipped++; continue; }
+    // Features are checked for EVERY signal with a backfill row, labelled or not,
+    // so the A1 reproduction check covers the whole backfill table.
     const f = mtfTrend(closedBefore(B15[s.symbol], 15, t), closedBefore(B60[s.symbol], 60, t));
     const bf = backfill.get(s.id);
     if (bf) {
@@ -81,6 +81,9 @@ async function main() {
       }
       checked++;
     }
+
+    const lab = labels.get(s.id);
+    if (!lab?.['tb_3x1.5_48'] || !lab?.['tb_2x1_48']) { skipped++; continue; }
 
     const sig: Sig = { id: s.id, symbol: s.symbol, timeframe: s.timeframe, pattern: s.pattern, direction: s.direction, entry: Number(s.entry), detected_at: t };
     const twin: Sig = { ...sig, direction: s.direction === 'long' ? 'short' : 'long' };
@@ -97,11 +100,15 @@ async function main() {
       lab['tb_3x1.5_48'].r, lab['tb_3x1.5_48'].label, t3.ret_r_net, lab['tb_2x1_48'].r, lab['tb_2x1_48'].label, t2.ret_r_net].join(','));
   }
 
-  console.log(`feature check vs DB backfill: ${checked} rows compared, max abs diff ${maxDiff}`);
+  // Amendment A1: every backfill row must have been compared, and all must match.
+  const expected = sigs.filter(s => backfill.has(s.id) && K[s.symbol]).length;
+  console.log(`feature check vs DB backfill: ${checked} of ${expected} rows compared (table holds ${backfill.size}), max abs diff ${maxDiff}`);
+  if (checked === 0 || checked !== expected) throw new Error(`A1 check incomplete: compared ${checked}, expected ${expected}.`);
   if (!(maxDiff < 1e-9)) throw new Error('Locally computed features do not reproduce the backfill rows — stopping (amendment A1).');
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(path.join(OUT, 'dataset.csv'), rows.join('\n'));
-  console.log(`wrote ${rows.length - 1} rows (${skipped} skipped: unlabelled or twin unresolved), ${nextCluster} clusters`);
+  const clusters = new Set(rows.slice(1).map(r => r.split(',')[2])).size;
+  console.log(`wrote ${rows.length - 1} rows (${skipped} skipped: unlabelled or twin unresolved), ${clusters} clusters in written rows`);
 }
 
 main().catch(e => { console.error('FAILED:', e.message); process.exit(1); });
